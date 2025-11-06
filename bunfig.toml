@@ -10,3 +10,4 @@ run = "bun --watch src/index.ts"
 [install]
 exact = true
 
+

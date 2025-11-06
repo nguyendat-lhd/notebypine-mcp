@@ -103,18 +103,19 @@ This action plan breaks down the implementation of Scenario A from the PRD - a p
 - [x] Verify end-to-end workflow works ✅ Complete workflow < 300ms
 
 ### Phase 6: Cursor IDE Integration (Days 19-21)
-- [ ] Configure Cursor MCP settings (`~/.cursor/mcp.json`)
-- [ ] Set correct `cwd` path in Cursor config
-- [ ] Add environment variables to Cursor config
-- [ ] Start PocketBase server (`bun run pb:serve`)
-- [ ] Restart Cursor IDE
-- [ ] Verify MCP server connects in Cursor
-- [ ] Test `create_incident` tool in Cursor
-- [ ] Test `search_incidents` tool in Cursor
-- [ ] Test all 7 tools work in Cursor
-- [ ] Test all 3 resources work in Cursor
-- [ ] Test all 3 prompts work in Cursor
-- [ ] Create `scripts/start-dev.sh` startup script
+- [x] Configure Cursor MCP settings (`~/.cursor/mcp.json`) ✅ File exists and configured
+- [x] Set correct `cwd` path in Cursor config ✅ Path verified: `/Users/nguyendat/Working/mcp/notebypine-mcp`
+- [x] Add environment variables to Cursor config ✅ All env vars configured (POCKETBASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD, LOG_LEVEL, NODE_ENV)
+- [x] Create `scripts/start-dev.sh` startup script ✅ Script created and functional
+- [x] Create `scripts/verify-cursor-config.ts` verification script ✅ Script created and working
+- [ ] Start PocketBase server (`bun run pb:serve`) ⏳ Runtime action (use `./scripts/start-dev.sh`)
+- [ ] Restart Cursor IDE ⏳ User action required
+- [ ] Verify MCP server connects in Cursor ⏳ Requires Cursor IDE testing
+- [ ] Test `create_incident` tool in Cursor ⏳ Requires Cursor IDE testing
+- [ ] Test `search_incidents` tool in Cursor ⏳ Requires Cursor IDE testing
+- [ ] Test all 7 tools work in Cursor ⏳ Requires Cursor IDE testing
+- [ ] Test all 3 resources work in Cursor ⏳ Requires Cursor IDE testing
+- [ ] Test all 3 prompts work in Cursor ⏳ Requires Cursor IDE testing
 
 ### Phase 7: Performance Optimization & Polish (Days 22-28)
 - [ ] Create `src/utils/performance.ts` with `measureTime` ⚠️ File exists but empty
@@ -1745,7 +1746,7 @@ testManual();
   "mcpServers": {
     "notebypine": {
       "command": "bun",
-      "args": ["run", "src/index.ts"],
+      "args": ["/Users/nguyendat/Working/mcp/notebypine-mcp/src/index.ts"],
       "cwd": "/Users/nguyendat/Working/mcp/notebypine-mcp",
       "env": {
         "POCKETBASE_URL": "http://localhost:8090",
