@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+.bun/
+
+# PocketBase data
+pb_data/
+*.pb
+
+# Environment
+.env
+.env.local
+
+# Build output
+dist/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/

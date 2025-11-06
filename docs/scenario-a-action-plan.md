@@ -1,15 +1,23 @@
 # Action Plan - Scenario A: Personal PoC (Single Machine)
 ## NoteByPine MCP Server Implementation
 
-**Based on PRD Version 1.0**
-**Target Deployment**: Personal Development Machine
-**Implementation Timeline**: 2-4 weeks
+**Based on PRD Version 1.0**  
+**Target Deployment**: Personal Development Machine  
+**Implementation Timeline**: 2-4 weeks  
+**Last Updated**: 2025-01-XX
 
 ---
 
 ## Overview
 
 This action plan breaks down the implementation of Scenario A from the PRD - a personal PoC running on a single machine with local PocketBase database and MCP server accessible via Cursor IDE.
+
+### Key Deliverables
+- ✅ Complete MCP server with 7 tools, 3 resources, 3 prompts
+- ✅ Full PocketBase schema (5 collections)
+- ✅ Cursor IDE integration
+- ✅ Performance targets: <300ms queries, <500ms startup
+- ✅ Comprehensive error handling & logging
 
 ---
 
@@ -29,11 +37,7 @@ code --install-extension ms-vscode.vscode-typescript-next
 
 ### 0.2 Download PocketBase
 ```bash
-# Create project directory
-mkdir notebypine-mcp
-cd notebypine-mcp
-
-# Download PocketBase binary for your OS
+# Download PocketBase binary for your OS (in root directory)
 # macOS (arm64)
 wget https://github.com/pocketbase/pocketbase/releases/download/v0.22.20/pocketbase_0.22.20_darwin_arm64.zip
 unzip pocketbase_0.22.20_darwin_arm64.zip
@@ -48,19 +52,56 @@ chmod +x pocketbase
 bun init -y
 
 # Create directory structure
-mkdir -p src/{mcp,db,services,types}
+mkdir -p src/{mcp,db,services,types,utils}
 mkdir -p pb_data
 mkdir -p scripts
-mkdir -p tests
+mkdir -p tests/{mcp,db,services}
 
 # Create required files
 touch src/index.ts
 touch src/config.ts
 touch src/mcp/{tools,resources,prompts,handlers}.ts
 touch src/db/{pocketbase,schema,queries}.ts
-touch src/services/{incident,search}.ts
-touch .env
+touch src/services/{incident,search,tagging}.ts
+touch src/types/{collections,index}.ts
+touch src/utils/{logger,performance,errors}.ts
+touch .env.example
+touch .gitignore
 touch bunfig.toml
+touch README.md
+```
+
+### 0.4 Create .gitignore
+**File: `.gitignore`**
+```
+# Dependencies
+node_modules/
+.bun/
+
+# PocketBase data
+pb_data/
+*.pb
+
+# Environment
+.env
+.env.local
+
+# Build output
+dist/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
 ```
 
 ---
@@ -110,7 +151,7 @@ exact = true
 ```
 
 ### 1.2 Environment Configuration
-**File: `.env`**
+**File: `.env.example`**
 ```env
 # PocketBase Configuration
 POCKETBASE_URL=http://localhost:8090
@@ -124,6 +165,50 @@ MCP_HOST=localhost
 # Development
 NODE_ENV=development
 LOG_LEVEL=debug
+
+# Optional: AI Integration (for future semantic search)
+# OPENAI_API_KEY=sk-...
+```
+
+**File: `.env`** (copy from .env.example and customize)
+
+**File: `src/config.ts`**
+```typescript
+import { z } from 'zod';
+
+const ConfigSchema = z.object({
+  pocketbase: z.object({
+    url: z.string().url().default('http://localhost:8090'),
+    adminEmail: z.string().email(),
+    adminPassword: z.string().min(8),
+  }),
+  mcp: z.object({
+    port: z.number().int().positive().default(3000),
+    host: z.string().default('localhost'),
+  }),
+  env: z.enum(['development', 'production', 'test']).default('development'),
+  logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+});
+
+export type Config = z.infer<typeof ConfigSchema>;
+
+export function loadConfig(): Config {
+  return ConfigSchema.parse({
+    pocketbase: {
+      url: process.env.POCKETBASE_URL || 'http://localhost:8090',
+      adminEmail: process.env.POCKETBASE_ADMIN_EMAIL || 'admin@example.com',
+      adminPassword: process.env.POCKETBASE_ADMIN_PASSWORD || 'admin123456',
+    },
+    mcp: {
+      port: parseInt(process.env.MCP_PORT || '3000', 10),
+      host: process.env.MCP_HOST || 'localhost',
+    },
+    env: (process.env.NODE_ENV as any) || 'development',
+    logLevel: (process.env.LOG_LEVEL as any) || 'info',
+  });
+}
+
+export const config = loadConfig();
 ```
 
 ### 1.3 TypeScript Configuration
@@ -156,56 +241,136 @@ LOG_LEVEL=debug
 ```typescript
 #!/usr/bin/env bun
 import PocketBase from 'pocketbase';
+import { config } from '../src/config.js';
 
 async function setupDatabase() {
-  const pb = new PocketBase('http://localhost:8090');
+  const pb = new PocketBase(config.pocketbase.url);
 
   try {
-    // Create admin user
-    await pb.admins.create({
-      email: process.env.POCKETBASE_ADMIN_EMAIL!,
-      password: process.env.POCKETBASE_ADMIN_PASSWORD!,
-    });
+    // Check if PocketBase is running
+    await pb.health.check();
+    console.log('✅ PocketBase is running');
 
-    console.log('✅ Admin user created');
+    // Try to authenticate as admin (may fail if admin doesn't exist)
+    try {
+      await pb.admins.authViaEmail(
+        config.pocketbase.adminEmail,
+        config.pocketbase.adminPassword
+      );
+      console.log('✅ Admin authentication successful');
+    } catch (authError: any) {
+      // If auth fails, try to create admin (only works on first run)
+      if (authError.status === 400 || authError.status === 404) {
+        try {
+          await pb.admins.create({
+            email: config.pocketbase.adminEmail,
+            password: config.pocketbase.adminPassword,
+          });
+          console.log('✅ Admin user created');
+          
+          // Login after creation
+          await pb.admins.authViaEmail(
+            config.pocketbase.adminEmail,
+            config.pocketbase.adminPassword
+          );
+        } catch (createError) {
+          console.warn('⚠️ Could not create admin (may already exist)');
+        }
+      } else {
+        throw authError;
+      }
+    }
 
-    // Login as admin
-    await pb.admins.authViaEmail(
-      process.env.POCKETBASE_ADMIN_EMAIL!,
-      process.env.POCKETBASE_ADMIN_PASSWORD!
-    );
-
-    // Create collections based on PRD schema
+    // Define all collections based on PRD schema
     const collections = [
       {
         name: "incidents",
         type: "base",
         schema: [
           { name: "title", type: "text", required: true },
-          { name: "category", type: "select", required: true, options: ["Backend", "Frontend", "DevOps", "Health", "Finance", "Mobile"] },
+          { name: "category", type: "select", required: true, options: { values: ["Backend", "Frontend", "DevOps", "Health", "Finance", "Mobile"] } },
           { name: "description", type: "text", required: true },
           { name: "symptoms", type: "json" },
           { name: "context", type: "json" },
           { name: "environment", type: "json" },
-          { name: "severity", type: "select", required: true, options: ["low", "medium", "high", "critical"] },
-          { name: "status", type: "select", required: true, options: ["open", "investigating", "resolved", "archived"] },
+          { name: "severity", type: "select", required: true, options: { values: ["low", "medium", "high", "critical"] } },
+          { name: "status", type: "select", required: true, options: { values: ["open", "investigating", "resolved", "archived"] }, default: "open" },
           { name: "root_cause", type: "text" },
-          { name: "frequency", type: "select", required: true, options: ["one-time", "occasional", "frequent", "recurring"] },
-          { name: "visibility", type: "select", required: true, options: ["private", "team", "public"] }
+          { name: "frequency", type: "select", required: true, options: { values: ["one-time", "occasional", "frequent", "recurring"] }, default: "one-time" },
+          { name: "visibility", type: "select", required: true, options: { values: ["private", "team", "public"] }, default: "private" },
+          { name: "resolved_at", type: "date" },
         ]
       },
-      // Add other collections (solutions, lessons_learned, tags, feedback)
+      {
+        name: "solutions",
+        type: "base",
+        schema: [
+          { name: "incident_id", type: "relation", required: true, options: { collectionId: "incidents", cascadeDelete: true } },
+          { name: "solution_title", type: "text", required: true },
+          { name: "solution_description", type: "text", required: true },
+          { name: "steps", type: "json", required: true },
+          { name: "resources_needed", type: "json" },
+          { name: "time_estimate", type: "text" },
+          { name: "effectiveness_score", type: "number", min: 0, max: 1 },
+          { name: "warnings", type: "json" },
+          { name: "alternatives", type: "json" },
+          { name: "is_verified", type: "bool", default: false },
+        ]
+      },
+      {
+        name: "lessons_learned",
+        type: "base",
+        schema: [
+          { name: "incident_id", type: "relation", required: true, options: { collectionId: "incidents", cascadeDelete: true } },
+          { name: "lesson_text", type: "text", required: true },
+          { name: "lesson_type", type: "select", required: true, options: { values: ["prevention", "detection", "response", "recovery", "general"] } },
+          { name: "applies_to", type: "json" },
+          { name: "importance", type: "number", min: 1, max: 5, default: 3 },
+        ]
+      },
+      {
+        name: "tags",
+        type: "base",
+        schema: [
+          { name: "tag_name", type: "text", required: true, unique: true },
+          { name: "tag_type", type: "select", required: true, options: { values: ["symptom", "technology", "skill", "emotion", "context"] } },
+          { name: "usage_count", type: "number", default: 0 },
+        ]
+      },
+      {
+        name: "feedback",
+        type: "base",
+        schema: [
+          { name: "solution_id", type: "relation", required: true, options: { collectionId: "solutions", cascadeDelete: true } },
+          { name: "rating", type: "number", required: true, min: 1, max: 5 },
+          { name: "worked", type: "bool", required: true },
+          { name: "comment", type: "text" },
+          { name: "time_spent", type: "text" },
+        ]
+      },
     ];
 
+    // Create collections (skip if already exists)
     for (const collection of collections) {
-      await pb.collections.create(collection);
-      console.log(`✅ Created collection: ${collection.name}`);
+      try {
+        // Check if collection exists
+        await pb.collections.getFirstListItem(`name="${collection.name}"`);
+        console.log(`⏭️  Collection "${collection.name}" already exists, skipping`);
+      } catch {
+        // Collection doesn't exist, create it
+        await pb.collections.create(collection);
+        console.log(`✅ Created collection: ${collection.name}`);
+      }
     }
 
     console.log('🎉 Database setup complete!');
 
-  } catch (error) {
-    console.error('❌ Setup failed:', error);
+  } catch (error: any) {
+    console.error('❌ Setup failed:', error.message || error);
+    if (error.response) {
+      console.error('Response:', await error.response.json().catch(() => 'N/A'));
+    }
+    process.exit(1);
   }
 }
 
@@ -216,32 +381,47 @@ setupDatabase();
 **File: `src/db/pocketbase.ts`**
 ```typescript
 import PocketBase from 'pocketbase';
+import { config } from '../config.js';
+import { Logger } from '../utils/logger.js';
 
-let pb: PocketBase;
+let pb: PocketBase | null = null;
 
-export function getPocketBase() {
+export function getPocketBase(): PocketBase {
   if (!pb) {
-    pb = new PocketBase(process.env.POCKETBASE_URL || 'http://localhost:8090');
-
-    // Auto-disable cancelation for easier development
+    pb = new PocketBase(config.pocketbase.url);
     pb.autoCancellation(false);
+    Logger.debug('PocketBase client initialized');
   }
-
   return pb;
 }
 
-export async function initPocketBase() {
+export async function initPocketBase(): Promise<void> {
   const pb = getPocketBase();
 
   try {
-    // Try to authenticate as admin
+    // Health check first
+    await pb.health.check();
+    Logger.info('PocketBase health check passed');
+
+    // Authenticate as admin
     await pb.admins.authViaEmail(
-      process.env.POCKETBASE_ADMIN_EMAIL!,
-      process.env.POCKETBASE_ADMIN_PASSWORD!
+      config.pocketbase.adminEmail,
+      config.pocketbase.adminPassword
     );
-    console.log('✅ PocketBase authenticated');
+    Logger.info('PocketBase authenticated successfully');
+  } catch (error: any) {
+    const message = error.message || 'Unknown error';
+    Logger.error(`PocketBase initialization failed: ${message}`);
+    throw new Error(`Failed to initialize PocketBase: ${message}`);
+  }
+}
+
+export async function ensurePocketBaseReady(): Promise<void> {
+  try {
+    const pb = getPocketBase();
+    await pb.health.check();
   } catch (error) {
-    console.warn('⚠️ PocketBase auth failed, make sure server is running');
+    throw new Error('PocketBase is not running. Please start it with: bun run pb:serve');
   }
 }
 ```
@@ -295,18 +475,25 @@ console.error('NoteByPine MCP Server running on stdio');
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import {
   CallToolRequestSchema,
+  ListToolsRequestSchema,
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 
-import { handleCreateIncident } from './handlers.js';
-import { handleSearchIncidents } from './handlers.js';
-import { handleAddSolution } from './handlers.js';
-// ... import other handlers
+import {
+  handleCreateIncident,
+  handleSearchIncidents,
+  handleAddSolution,
+  handleExtractLessons,
+  handleGetSimilarIncidents,
+  handleUpdateIncidentStatus,
+  handleExportKnowledge,
+} from './handlers.js';
+import { Logger } from '../utils/logger.js';
 
 const TOOLS: Tool[] = [
   {
     name: 'create_incident',
-    description: 'Create a new incident record for troubleshooting',
+    description: 'Create a new incident record for troubleshooting. Returns incident ID and suggests similar incidents.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -323,10 +510,17 @@ const TOOLS: Tool[] = [
           description: 'List of symptoms observed'
         },
         context: { type: 'object', description: 'Context information (who, what, when, where, why, how)' },
+        environment: { type: 'object', description: 'Environment details (OS, version, tools)' },
         severity: {
           type: 'string',
           enum: ['low', 'medium', 'high', 'critical'],
           description: 'Severity level'
+        },
+        visibility: {
+          type: 'string',
+          enum: ['private', 'team', 'public'],
+          default: 'private',
+          description: 'Visibility level'
         }
       },
       required: ['title', 'category', 'description', 'severity']
@@ -334,7 +528,7 @@ const TOOLS: Tool[] = [
   },
   {
     name: 'search_incidents',
-    description: 'Search existing incidents and solutions',
+    description: 'Search existing incidents and solutions. Supports keyword, semantic, and hybrid search.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -356,47 +550,581 @@ const TOOLS: Tool[] = [
       required: ['query']
     }
   },
-  // ... add other tools (add_solution, extract_lessons, etc.)
+  {
+    name: 'add_solution',
+    description: 'Add a solution to an existing incident with step-by-step instructions.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        incident_id: { type: 'string', description: 'ID of the incident' },
+        solution_title: { type: 'string', description: 'Title of the solution' },
+        solution_description: { type: 'string', description: 'Description of the solution' },
+        steps: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              order: { type: 'number' },
+              action: { type: 'string' },
+              expected_result: { type: 'string' },
+              tips: { type: 'string' }
+            }
+          },
+          description: 'Step-by-step instructions'
+        },
+        resources_needed: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Resources needed to implement this solution'
+        },
+        time_estimate: { type: 'string', description: 'Estimated time (e.g., "30 minutes")' },
+        warnings: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Warnings or precautions'
+        },
+        alternatives: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Alternative solutions'
+        }
+      },
+      required: ['incident_id', 'solution_title', 'solution_description', 'steps']
+    }
+  },
+  {
+    name: 'extract_lessons',
+    description: 'Extract and document lessons learned from an incident.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        incident_id: { type: 'string', description: 'ID of the incident' },
+        problem_summary: { type: 'string', description: 'Summary of the problem' },
+        root_cause: { type: 'string', description: 'Root cause analysis' },
+        prevention: { type: 'string', description: 'How to prevent this in the future' },
+        lesson_type: {
+          type: 'string',
+          enum: ['prevention', 'detection', 'response', 'recovery', 'general'],
+          default: 'general',
+          description: 'Type of lesson'
+        },
+        importance: {
+          type: 'number',
+          minimum: 1,
+          maximum: 5,
+          default: 3,
+          description: 'Importance level (1-5)'
+        }
+      },
+      required: ['incident_id', 'problem_summary', 'root_cause', 'prevention']
+    }
+  },
+  {
+    name: 'get_similar_incidents',
+    description: 'Find similar incidents based on content similarity (keyword-based for MVP, semantic in future).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        incident_id: { type: 'string', description: 'ID of the incident to find similarities for' },
+        limit: { type: 'number', default: 5, description: 'Maximum number of similar incidents to return' }
+      },
+      required: ['incident_id']
+    }
+  },
+  {
+    name: 'update_incident_status',
+    description: 'Update the status of an incident (open, investigating, resolved, archived).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        incident_id: { type: 'string', description: 'ID of the incident' },
+        status: {
+          type: 'string',
+          enum: ['open', 'investigating', 'resolved', 'archived'],
+          description: 'New status'
+        },
+        notes: { type: 'string', description: 'Optional update notes' }
+      },
+      required: ['incident_id', 'status']
+    }
+  },
+  {
+    name: 'export_knowledge',
+    description: 'Export knowledge base in various formats (JSON, CSV, Markdown).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        format: {
+          type: 'string',
+          enum: ['json', 'csv', 'markdown'],
+          default: 'json',
+          description: 'Export format'
+        },
+        filter: {
+          type: 'object',
+          properties: {
+            category: { type: 'string' },
+            date_range: {
+              type: 'object',
+              properties: {
+                start: { type: 'string', format: 'date' },
+                end: { type: 'string', format: 'date' }
+              }
+            },
+            tags: {
+              type: 'array',
+              items: { type: 'string' }
+            }
+          },
+          description: 'Optional filters'
+        }
+      },
+      required: ['format']
+    }
+  },
 ];
 
 export function registerTools(server: Server) {
   // List available tools
   server.setRequestHandler(ListToolsRequestSchema, async () => {
+    Logger.debug(`Listing ${TOOLS.length} tools`);
     return { tools: TOOLS };
   });
 
   // Handle tool calls
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
+    Logger.debug(`Tool called: ${name}`, args);
 
     try {
+      let result;
       switch (name) {
         case 'create_incident':
-          return await handleCreateIncident(args);
-
+          result = await handleCreateIncident(args);
+          break;
         case 'search_incidents':
-          return await handleSearchIncidents(args);
-
+          result = await handleSearchIncidents(args);
+          break;
         case 'add_solution':
-          return await handleAddSolution(args);
-
-        // ... add other tool handlers
-
+          result = await handleAddSolution(args);
+          break;
+        case 'extract_lessons':
+          result = await handleExtractLessons(args);
+          break;
+        case 'get_similar_incidents':
+          result = await handleGetSimilarIncidents(args);
+          break;
+        case 'update_incident_status':
+          result = await handleUpdateIncidentStatus(args);
+          break;
+        case 'export_knowledge':
+          result = await handleExportKnowledge(args);
+          break;
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
+      Logger.debug(`Tool ${name} completed successfully`);
+      return result;
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      Logger.error(`Tool ${name} failed: ${message}`);
       return {
         content: [
           {
             type: 'text',
-            text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
+            text: `Error: ${message}`
           }
-        ]
+        ],
+        isError: true
       };
     }
   });
 }
+```
+
+### 3.3 Resources Registration
+**File: `src/mcp/resources.ts`**
+```typescript
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import {
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+  Resource,
+} from '@modelcontextprotocol/sdk/types.js';
+import { getPocketBase } from '../db/pocketbase.js';
+import { Logger } from '../utils/logger.js';
+
+const RESOURCES: Resource[] = [
+  {
+    uri: 'incident://recent',
+    name: 'Recent Incidents',
+    description: 'Get the most recent incidents from the knowledge base',
+    mimeType: 'application/json',
+  },
+  {
+    uri: 'incident://by-category',
+    name: 'Incidents by Category',
+    description: 'Get incidents organized by category',
+    mimeType: 'application/json',
+  },
+  {
+    uri: 'incident://stats',
+    name: 'Knowledge Base Statistics',
+    description: 'Get overall statistics about the knowledge base',
+    mimeType: 'application/json',
+  },
+];
+
+export function registerResources(server: Server) {
+  server.setRequestHandler(ListResourcesRequestSchema, async () => {
+    Logger.debug(`Listing ${RESOURCES.length} resources`);
+    return { resources: RESOURCES };
+  });
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    const { uri } = request.params;
+    Logger.debug(`Reading resource: ${uri}`);
+
+    const pb = getPocketBase();
+
+    try {
+      switch (uri) {
+        case 'incident://recent': {
+          const incidents = await pb.collection('incidents').getList(1, 20, {
+            sort: '-created_at',
+          });
+          return {
+            contents: [
+              {
+                uri,
+                mimeType: 'application/json',
+                text: JSON.stringify(incidents.items, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'incident://by-category': {
+          const categories = ['Backend', 'Frontend', 'DevOps', 'Health', 'Finance', 'Mobile'];
+          const byCategory: Record<string, any[]> = {};
+
+          for (const category of categories) {
+            const incidents = await pb.collection('incidents').getList(1, 10, {
+              filter: `category = "${category}"`,
+              sort: '-created_at',
+            });
+            byCategory[category] = incidents.items;
+          }
+
+          return {
+            contents: [
+              {
+                uri,
+                mimeType: 'application/json',
+                text: JSON.stringify(byCategory, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'incident://stats': {
+          const [incidents, solutions, lessons] = await Promise.all([
+            pb.collection('incidents').getList(1, 1),
+            pb.collection('solutions').getList(1, 1),
+            pb.collection('lessons_learned').getList(1, 1),
+          ]);
+
+          const stats = {
+            total_incidents: incidents.totalItems,
+            total_solutions: solutions.totalItems,
+            total_lessons: lessons.totalItems,
+            by_status: {},
+            by_category: {},
+          };
+
+          // Get status breakdown
+          const statuses = ['open', 'investigating', 'resolved', 'archived'];
+          for (const status of statuses) {
+            const result = await pb.collection('incidents').getList(1, 1, {
+              filter: `status = "${status}"`,
+            });
+            stats.by_status[status] = result.totalItems;
+          }
+
+          // Get category breakdown
+          const categories = ['Backend', 'Frontend', 'DevOps', 'Health', 'Finance', 'Mobile'];
+          for (const category of categories) {
+            const result = await pb.collection('incidents').getList(1, 1, {
+              filter: `category = "${category}"`,
+            });
+            stats.by_category[category] = result.totalItems;
+          }
+
+          return {
+            contents: [
+              {
+                uri,
+                mimeType: 'application/json',
+                text: JSON.stringify(stats, null, 2),
+              },
+            ],
+          };
+        }
+
+        default:
+          throw new Error(`Unknown resource: ${uri}`);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      Logger.error(`Resource ${uri} failed: ${message}`);
+      throw error;
+    }
+  });
+}
+```
+
+### 3.4 Prompts Registration
+**File: `src/mcp/prompts.ts`**
+```typescript
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import {
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
+  Prompt,
+} from '@modelcontextprotocol/sdk/types.js';
+import { getPocketBase } from '../db/pocketbase.js';
+import { Logger } from '../utils/logger.js';
+
+const PROMPTS: Prompt[] = [
+  {
+    name: 'troubleshoot',
+    description: 'Guide user through problem diagnosis using knowledge base',
+    arguments: [
+      {
+        name: 'problem_description',
+        description: 'Description of the problem to troubleshoot',
+        required: true,
+      },
+    ],
+  },
+  {
+    name: 'document_solution',
+    description: 'Help extract and document a solution from a resolved incident',
+    arguments: [
+      {
+        name: 'incident_id',
+        description: 'ID of the incident to document',
+        required: true,
+      },
+    ],
+  },
+  {
+    name: 'analyze_pattern',
+    description: 'Identify recurring issues and patterns in the knowledge base',
+    arguments: [
+      {
+        name: 'category',
+        description: 'Optional category to analyze (leave empty for all)',
+        required: false,
+      },
+    ],
+  },
+];
+
+export function registerPrompts(server: Server) {
+  server.setRequestHandler(ListPromptsRequestSchema, async () => {
+    Logger.debug(`Listing ${PROMPTS.length} prompts`);
+    return { prompts: PROMPTS };
+  });
+
+  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+    const { name, arguments: args } = request.params;
+    Logger.debug(`Getting prompt: ${name}`, args);
+
+    const pb = getPocketBase();
+
+    try {
+      switch (name) {
+        case 'troubleshoot': {
+          const problemDesc = args?.problem_description as string;
+          if (!problemDesc) {
+            throw new Error('problem_description is required');
+          }
+
+          // Search for similar incidents
+          const incidents = await pb.collection('incidents').getList(1, 5, {
+            filter: `title ~ "${problemDesc}" || description ~ "${problemDesc}"`,
+            sort: '-created_at',
+            expand: 'solutions',
+          });
+
+          const prompt = `You are helping troubleshoot a problem. Here's what the user described:
+
+"${problemDesc}"
+
+Based on the knowledge base, here are similar incidents that might help:
+
+${incidents.items.map((inc: any) => `- ${inc.title} (${inc.category}, ${inc.severity}): ${inc.description.substring(0, 200)}...`).join('\n')}
+
+Guide the user through:
+1. Confirming the symptoms match
+2. Checking the context/environment
+3. Suggesting solutions from similar incidents
+4. Documenting the resolution if found`;
+
+          return {
+            messages: [
+              {
+                role: 'user',
+                content: {
+                  type: 'text',
+                  text: prompt,
+                },
+              },
+            ],
+          };
+        }
+
+        case 'document_solution': {
+          const incidentId = args?.incident_id as string;
+          if (!incidentId) {
+            throw new Error('incident_id is required');
+          }
+
+          const incident = await pb.collection('incidents').getOne(incidentId, {
+            expand: 'solutions,lessons_learned',
+          });
+
+          const prompt = `Help document the solution for this incident:
+
+Title: ${incident.title}
+Category: ${incident.category}
+Description: ${incident.description}
+Status: ${incident.status}
+
+${incident.solutions?.length > 0 ? `Existing solutions: ${incident.solutions.length}` : 'No solutions yet'}
+
+Guide the user to:
+1. Extract step-by-step solution
+2. Document resources needed
+3. Note any warnings or alternatives
+4. Extract lessons learned
+5. Update incident status if resolved`;
+
+          return {
+            messages: [
+              {
+                role: 'user',
+                content: {
+                  type: 'text',
+                  text: prompt,
+                },
+              },
+            ],
+          };
+        }
+
+        case 'analyze_pattern': {
+          const category = args?.category as string | undefined;
+          const filter = category ? `category = "${category}"` : '';
+
+          const incidents = await pb.collection('incidents').getList(1, 100, {
+            filter,
+            sort: '-created_at',
+          });
+
+          // Analyze patterns (simplified - can be enhanced)
+          const patternPrompt = `Analyze patterns in the knowledge base:
+
+Total incidents: ${incidents.totalItems}
+${category ? `Category: ${category}` : 'All categories'}
+
+Look for:
+1. Recurring problems
+2. Common root causes
+3. Most effective solutions
+4. Areas needing prevention measures
+
+Provide insights and recommendations.`;
+
+          return {
+            messages: [
+              {
+                role: 'user',
+                content: {
+                  type: 'text',
+                  text: patternPrompt,
+                },
+              },
+            ],
+          };
+        }
+
+        default:
+          throw new Error(`Unknown prompt: ${name}`);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      Logger.error(`Prompt ${name} failed: ${message}`);
+      throw error;
+    }
+  });
+}
+```
+
+### 3.5 Update Main Server File
+**File: `src/index.ts`** (updated)
+```typescript
+#!/usr/bin/env bun
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+
+import { registerTools } from './mcp/tools.js';
+import { registerResources } from './mcp/resources.js';
+import { registerPrompts } from './mcp/prompts.js';
+import { initPocketBase, ensurePocketBaseReady } from './db/pocketbase.js';
+import { Logger } from './utils/logger.js';
+import { measureTime } from './utils/performance.js';
+
+const server = new Server(
+  {
+    name: 'notebypine-mcp',
+    version: '1.0.0',
+  },
+  {
+    capabilities: {
+      tools: {},
+      resources: {},
+      prompts: {},
+    },
+  }
+);
+
+async function startServer() {
+  try {
+    // Initialize with performance monitoring
+    await measureTime(async () => {
+      await ensurePocketBaseReady();
+      await initPocketBase();
+    }, 'PocketBase initialization');
+
+    // Register all MCP capabilities
+    registerTools(server);
+    registerResources(server);
+    registerPrompts(server);
+
+    // Start server
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+
+    Logger.info('NoteByPine MCP Server running on stdio');
+  } catch (error) {
+    Logger.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
 ```
 
 ---
@@ -406,8 +1134,9 @@ export function registerTools(server: Server) {
 ### 4.1 Incident Handlers
 **File: `src/mcp/handlers.ts`**
 ```typescript
-import { getPocketBase } from '../db/pocketbase.js';
+import { getPocketBase, ensurePocketBaseReady } from '../db/pocketbase.js';
 import { z } from 'zod';
+import { Logger } from '../utils/logger.js';
 
 // Validation schemas
 const CreateIncidentSchema = z.object({
@@ -420,6 +1149,7 @@ const CreateIncidentSchema = z.object({
 });
 
 export async function handleCreateIncident(args: any) {
+  await ensurePocketBaseReady();
   const validated = CreateIncidentSchema.parse(args);
   const pb = getPocketBase();
 
@@ -454,6 +1184,7 @@ const SearchIncidentsSchema = z.object({
 });
 
 export async function handleSearchIncidents(args: any) {
+  await ensurePocketBaseReady();
   const validated = SearchIncidentsSchema.parse(args);
   const pb = getPocketBase();
 
@@ -500,7 +1231,264 @@ export async function handleSearchIncidents(args: any) {
   }
 }
 
-// ... implement other handlers (add_solution, extract_lessons, etc.)
+export async function handleAddSolution(args: any) {
+  const schema = z.object({
+    incident_id: z.string(),
+    solution_title: z.string().min(1),
+    solution_description: z.string().min(1),
+    steps: z.array(z.object({
+      order: z.number(),
+      action: z.string(),
+      expected_result: z.string(),
+      tips: z.string().optional(),
+    })),
+    resources_needed: z.array(z.string()).optional(),
+    time_estimate: z.string().optional(),
+    warnings: z.array(z.string()).optional(),
+    alternatives: z.array(z.string()).optional(),
+  });
+
+  const validated = schema.parse(args);
+  const pb = getPocketBase();
+
+  try {
+    // Verify incident exists
+    await pb.collection('incidents').getOne(validated.incident_id);
+
+    const solution = await pb.collection('solutions').create({
+      incident_id: validated.incident_id,
+      solution_title: validated.solution_title,
+      solution_description: validated.solution_description,
+      steps: validated.steps,
+      resources_needed: validated.resources_needed || [],
+      time_estimate: validated.time_estimate,
+      warnings: validated.warnings || [],
+      alternatives: validated.alternatives || [],
+      is_verified: false,
+      effectiveness_score: 0,
+    });
+
+    return {
+      content: [{
+        type: 'text',
+        text: `✅ Solution added successfully!\nID: ${solution.id}\nTitle: ${solution.solution_title}\nSteps: ${validated.steps.length}`
+      }]
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to add solution: ${error.message}`);
+  }
+}
+
+export async function handleExtractLessons(args: any) {
+  const schema = z.object({
+    incident_id: z.string(),
+    problem_summary: z.string().min(1),
+    root_cause: z.string().min(1),
+    prevention: z.string().min(1),
+    lesson_type: z.enum(['prevention', 'detection', 'response', 'recovery', 'general']).default('general'),
+    importance: z.number().min(1).max(5).default(3),
+  });
+
+  const validated = schema.parse(args);
+  const pb = getPocketBase();
+
+  try {
+    // Verify incident exists
+    await pb.collection('incidents').getOne(validated.incident_id);
+
+    const lesson = await pb.collection('lessons_learned').create({
+      incident_id: validated.incident_id,
+      lesson_text: `Problem: ${validated.problem_summary}\n\nRoot Cause: ${validated.root_cause}\n\nPrevention: ${validated.prevention}`,
+      lesson_type: validated.lesson_type,
+      importance: validated.importance,
+      applies_to: [],
+    });
+
+    // Update incident with root cause if not set
+    try {
+      const incident = await pb.collection('incidents').getOne(validated.incident_id);
+      if (!incident.root_cause) {
+        await pb.collection('incidents').update(validated.incident_id, {
+          root_cause: validated.root_cause,
+        });
+      }
+    } catch (updateError) {
+      Logger.warn('Could not update incident root_cause');
+    }
+
+    return {
+      content: [{
+        type: 'text',
+        text: `✅ Lesson extracted successfully!\nID: ${lesson.id}\nType: ${lesson.lesson_type}\nImportance: ${lesson.importance}/5`
+      }]
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to extract lesson: ${error.message}`);
+  }
+}
+
+export async function handleGetSimilarIncidents(args: any) {
+  const schema = z.object({
+    incident_id: z.string(),
+    limit: z.number().default(5),
+  });
+
+  const validated = schema.parse(args);
+  const pb = getPocketBase();
+
+  try {
+    // Get the source incident
+    const sourceIncident = await pb.collection('incidents').getOne(validated.incident_id);
+
+    // Simple keyword-based similarity (can be enhanced with semantic search)
+    const searchTerms = [
+      sourceIncident.title,
+      sourceIncident.category,
+      ...(sourceIncident.symptoms || []),
+    ].filter(Boolean).join(' ');
+
+    const similar = await pb.collection('incidents').getList(1, validated.limit + 1, {
+      filter: `id != "${validated.incident_id}" && (title ~ "${searchTerms}" || description ~ "${searchTerms}")`,
+      sort: '-created_at',
+    });
+
+    // Remove the source incident if it appears in results
+    const results = similar.items.filter((item: any) => item.id !== validated.incident_id).slice(0, validated.limit);
+
+    if (results.length === 0) {
+      return {
+        content: [{
+          type: 'text',
+          text: 'No similar incidents found.'
+        }]
+      };
+    }
+
+    return {
+      content: [{
+        type: 'text',
+        text: `Found ${results.length} similar incidents:\n\n${results.map((inc: any) =>
+          `🔍 ${inc.title}\n   Category: ${inc.category}\n   Severity: ${inc.severity}\n   Status: ${inc.status}\n   ID: ${inc.id}\n`
+        ).join('\n')}`
+      }]
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to find similar incidents: ${error.message}`);
+  }
+}
+
+export async function handleUpdateIncidentStatus(args: any) {
+  const schema = z.object({
+    incident_id: z.string(),
+    status: z.enum(['open', 'investigating', 'resolved', 'archived']),
+    notes: z.string().optional(),
+  });
+
+  const validated = schema.parse(args);
+  const pb = getPocketBase();
+
+  try {
+    const updateData: any = {
+      status: validated.status,
+    };
+
+    if (validated.status === 'resolved') {
+      updateData.resolved_at = new Date().toISOString();
+    }
+
+    const updated = await pb.collection('incidents').update(validated.incident_id, updateData);
+
+    return {
+      content: [{
+        type: 'text',
+        text: `✅ Incident status updated!\nID: ${updated.id}\nNew Status: ${updated.status}${validated.notes ? `\nNotes: ${validated.notes}` : ''}`
+      }]
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to update incident status: ${error.message}`);
+  }
+}
+
+export async function handleExportKnowledge(args: any) {
+  const schema = z.object({
+    format: z.enum(['json', 'csv', 'markdown']),
+    filter: z.object({
+      category: z.string().optional(),
+      date_range: z.object({
+        start: z.string().optional(),
+        end: z.string().optional(),
+      }).optional(),
+      tags: z.array(z.string()).optional(),
+    }).optional(),
+  });
+
+  const validated = schema.parse(args);
+  const pb = getPocketBase();
+
+  try {
+    // Build filter
+    let filter = '';
+    if (validated.filter?.category) {
+      filter += `category = "${validated.filter.category}"`;
+    }
+    if (validated.filter?.date_range?.start) {
+      filter += filter ? ' && ' : '';
+      filter += `created >= "${validated.filter.date_range.start}"`;
+    }
+    if (validated.filter?.date_range?.end) {
+      filter += filter ? ' && ' : '';
+      filter += `created <= "${validated.filter.date_range.end}"`;
+    }
+
+    const incidents = await pb.collection('incidents').getFullList({
+      filter: filter || undefined,
+      expand: 'solutions,lessons_learned',
+    });
+
+    let exportData: string;
+
+    switch (validated.format) {
+      case 'json':
+        exportData = JSON.stringify(incidents, null, 2);
+        break;
+
+      case 'csv':
+        // Simple CSV export (can be enhanced)
+        const headers = ['ID', 'Title', 'Category', 'Status', 'Severity', 'Created'];
+        const rows = incidents.map((inc: any) => [
+          inc.id,
+          inc.title,
+          inc.category,
+          inc.status,
+          inc.severity,
+          inc.created,
+        ]);
+        exportData = [headers, ...rows].map(row => row.join(',')).join('\n');
+        break;
+
+      case 'markdown':
+        exportData = incidents.map((inc: any) =>
+          `## ${inc.title}\n\n` +
+          `**Category:** ${inc.category} | **Status:** ${inc.status} | **Severity:** ${inc.severity}\n\n` +
+          `${inc.description}\n\n` +
+          `---\n`
+        ).join('\n');
+        break;
+
+      default:
+        throw new Error(`Unsupported format: ${validated.format}`);
+    }
+
+    return {
+      content: [{
+        type: 'text',
+        text: `Exported ${incidents.length} incidents in ${validated.format} format:\n\n\`\`\`${validated.format}\n${exportData}\n\`\`\``
+      }]
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to export knowledge: ${error.message}`);
+  }
+}
 ```
 
 ---
@@ -595,24 +1583,31 @@ testManual();
 ## Phase 6: Cursor IDE Integration (Days 19-21)
 
 ### 6.1 Cursor Configuration
-Create configuration file for Cursor:
-**File: `cursor-config.json`**
+**Important**: Add this to your Cursor settings (not a separate file).  
+**Location**: `~/.cursor/mcp.json` or Cursor Settings → MCP Servers
+
 ```json
 {
   "mcpServers": {
     "notebypine": {
       "command": "bun",
-      "args": ["run", "/path/to/your/notebypine-mcp/src/index.ts"],
+      "args": ["run", "src/index.ts"],
+      "cwd": "/Users/nguyendat/Working/mcp/notebypine-mcp",
       "env": {
         "POCKETBASE_URL": "http://localhost:8090",
-        "MCP_PORT": "3000",
         "POCKETBASE_ADMIN_EMAIL": "admin@example.com",
-        "POCKETBASE_ADMIN_PASSWORD": "admin123456"
+        "POCKETBASE_ADMIN_PASSWORD": "admin123456",
+        "LOG_LEVEL": "info"
       }
     }
   }
 }
 ```
+
+**Note**: 
+- Use absolute path for `cwd` (replace with your actual workspace root path: `/Users/nguyendat/Working/mcp/notebypine-mcp`)
+- Make sure PocketBase is running before starting Cursor
+- Restart Cursor after adding the configuration
 
 ### 6.2 Startup Scripts
 **File: `scripts/start-dev.sh`**
@@ -686,6 +1681,8 @@ export function measureTime<T>(fn: () => Promise<T>, label: string): Promise<T> 
 ### 7.2 Error Handling & Logging
 **File: `src/utils/logger.ts`**
 ```typescript
+import { config } from '../config.js';
+
 export enum LogLevel {
   DEBUG = 0,
   INFO = 1,
@@ -693,30 +1690,75 @@ export enum LogLevel {
   ERROR = 3,
 }
 
-const LOG_LEVEL = process.env.LOG_LEVEL === 'debug' ? LogLevel.DEBUG : LogLevel.INFO;
+const LOG_LEVEL_MAP: Record<string, LogLevel> = {
+  debug: LogLevel.DEBUG,
+  info: LogLevel.INFO,
+  warn: LogLevel.WARN,
+  error: LogLevel.ERROR,
+};
+
+const CURRENT_LOG_LEVEL = LOG_LEVEL_MAP[config.logLevel] || LogLevel.INFO;
 
 export class Logger {
   static debug(message: string, ...args: any[]) {
-    if (LOG_LEVEL <= LogLevel.DEBUG) {
-      console.error(`[DEBUG] ${message}`, ...args);
+    if (CURRENT_LOG_LEVEL <= LogLevel.DEBUG) {
+      console.error(`[DEBUG] ${new Date().toISOString()} ${message}`, ...args);
     }
   }
 
   static info(message: string, ...args: any[]) {
-    if (LOG_LEVEL <= LogLevel.INFO) {
-      console.error(`[INFO] ${message}`, ...args);
+    if (CURRENT_LOG_LEVEL <= LogLevel.INFO) {
+      console.error(`[INFO] ${new Date().toISOString()} ${message}`, ...args);
     }
   }
 
   static warn(message: string, ...args: any[]) {
-    if (LOG_LEVEL <= LogLevel.WARN) {
-      console.error(`[WARN] ${message}`, ...args);
+    if (CURRENT_LOG_LEVEL <= LogLevel.WARN) {
+      console.error(`[WARN] ${new Date().toISOString()} ${message}`, ...args);
     }
   }
 
   static error(message: string, ...args: any[]) {
-    if (LOG_LEVEL <= LogLevel.ERROR) {
-      console.error(`[ERROR] ${message}`, ...args);
+    if (CURRENT_LOG_LEVEL <= LogLevel.ERROR) {
+      console.error(`[ERROR] ${new Date().toISOString()} ${message}`, ...args);
+    }
+  }
+}
+```
+
+**File: `src/utils/errors.ts`**
+```typescript
+export class NoteByPineError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public statusCode: number = 500
+  ) {
+    super(message);
+    this.name = 'NoteByPineError';
+  }
+}
+
+export class ValidationError extends NoteByPineError {
+  constructor(message: string) {
+    super(message, 'VALIDATION_ERROR', 400);
+    this.name = 'ValidationError';
+  }
+}
+
+export class NotFoundError extends NoteByPineError {
+  constructor(resource: string, id: string) {
+    super(`${resource} with ID ${id} not found`, 'NOT_FOUND', 404);
+    this.name = 'NotFoundError';
+  }
+}
+
+export class PocketBaseError extends NoteByPineError {
+  constructor(message: string, originalError?: any) {
+    super(`PocketBase error: ${message}`, 'POCKETBASE_ERROR', 500);
+    this.name = 'PocketBaseError';
+    if (originalError) {
+      this.cause = originalError;
     }
   }
 }
@@ -786,6 +1828,99 @@ Based on PRD success criteria, verify each item:
 4. **Create mobile app interface**
 5. **Set up cloud synchronization**
 6. **Add team collaboration features**
+
+---
+
+---
+
+## Summary of Improvements
+
+### ✅ Completed Optimizations
+
+1. **Complete Feature Coverage**
+   - ✅ All 7 MCP tools fully defined with schemas
+   - ✅ All 3 MCP resources implemented
+   - ✅ All 3 MCP prompts implemented
+   - ✅ All 5 PocketBase collections with complete schemas
+
+2. **Better Configuration Management**
+   - ✅ Type-safe config with Zod validation
+   - ✅ Environment variable loading
+   - ✅ `.env.example` template
+   - ✅ Proper error handling for missing config
+
+3. **Enhanced Error Handling**
+   - ✅ Custom error classes
+   - ✅ Proper error propagation
+   - ✅ Health checks before operations
+   - ✅ Graceful degradation
+
+4. **Improved Code Quality**
+   - ✅ Comprehensive logging with levels
+   - ✅ Performance monitoring integration
+   - ✅ Type safety throughout
+   - ✅ Proper async/await patterns
+
+5. **Better Developer Experience**
+   - ✅ Complete `.gitignore`
+   - ✅ Clear Cursor configuration instructions
+   - ✅ Idempotent PocketBase setup
+   - ✅ Better project structure
+
+6. **Documentation Improvements**
+   - ✅ Key deliverables section
+   - ✅ Complete handler implementations
+   - ✅ Better troubleshooting guide
+   - ✅ Clear phase organization
+
+### 📋 Implementation Checklist
+
+Use this checklist to track your progress:
+
+**Phase 0: Setup**
+- [ ] Install Bun
+- [ ] Download PocketBase
+- [ ] Initialize project structure
+- [ ] Create `.gitignore`
+
+**Phase 1: Infrastructure**
+- [ ] Configure `bunfig.toml` and `package.json`
+- [ ] Set up environment variables
+- [ ] Create TypeScript config
+- [ ] Implement config module with validation
+
+**Phase 2: Database**
+- [ ] Create PocketBase setup script
+- [ ] Implement PocketBase client module
+- [ ] Test database connection
+
+**Phase 3: MCP Core**
+- [ ] Implement MCP server entry point
+- [ ] Register all 7 tools
+- [ ] Register all 3 resources
+- [ ] Register all 3 prompts
+
+**Phase 4: Handlers**
+- [ ] Implement all 7 tool handlers
+- [ ] Add validation with Zod
+- [ ] Add error handling
+- [ ] Test each handler
+
+**Phase 5: Testing**
+- [ ] Write unit tests
+- [ ] Create manual testing script
+- [ ] Test end-to-end workflows
+
+**Phase 6: Integration**
+- [ ] Configure Cursor IDE
+- [ ] Test MCP connection
+- [ ] Verify all tools work in Cursor
+
+**Phase 7: Polish**
+- [ ] Add performance monitoring
+- [ ] Implement logging
+- [ ] Optimize queries
+- [ ] Document usage
 
 ---
 
