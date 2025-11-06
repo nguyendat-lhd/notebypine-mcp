@@ -6,7 +6,6 @@ main = "src/index.ts"
 run = "bun --watch src/index.ts"
 
 [test]
-preload = ["./tests/setup.ts"]
 
 [install]
 exact = true
