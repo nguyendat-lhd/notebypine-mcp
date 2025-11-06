@@ -1,8 +1,17 @@
 {
   "name": "notebypine-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for managing incident reports, solutions, and knowledge base using PocketBase",
+  "keywords": ["mcp", "model-context-protocol", "incident-management", "knowledge-base", "pocketbase"],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/notebypine-mcp.git"
+  },
   "module": "src/index.ts",
   "type": "module",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "build": "bun build src/index.ts --outdir ./dist",
