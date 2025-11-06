@@ -1,10 +1,26 @@
 {
   "name": "notebypine-mcp",
-  "module": "index.ts",
+  "module": "src/index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir ./dist",
+    "start": "bun src/index.ts",
+    "pb:serve": "./pocketbase serve --dir ./pb_data",
+    "setup:pocketbase": "bun scripts/setup-pocketbase.ts",
+    "test": "bun test",
+    "test:mcp": "bun test tests/mcp/"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "pocketbase": "^0.21.5",
+    "zod": "^3.22.4"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^20.0.0",
+    "bun-types": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
