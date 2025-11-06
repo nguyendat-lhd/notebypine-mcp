@@ -21,6 +21,158 @@ This action plan breaks down the implementation of Scenario A from the PRD - a p
 
 ---
 
+## 📋 Implementation Checklist
+
+### Phase 0: Environment Setup (Day 1)
+- [x] Install Bun runtime (`bun --version` works) ✅ Bun 1.3.1 installed
+- [x] Download PocketBase binary for your OS ✅ PocketBase binary exists
+- [x] Make PocketBase executable (`chmod +x pocketbase`) ✅ Already executable
+- [x] Initialize Bun project (`bun init -y`) ✅ Project initialized
+- [x] Create directory structure (src/, tests/, scripts/, pb_data/) ✅ All directories created
+- [x] Create all required files (touch commands) ✅ Files created
+- [x] Create `.gitignore` file ✅ .gitignore exists
+
+### Phase 1: Core Infrastructure (Days 2-4)
+- [x] Configure `bunfig.toml` ✅ bunfig.toml configured
+- [x] Update `package.json` with dependencies and scripts ✅ package.json complete with all deps
+- [x] Create `.env.example` template ✅ .env.example exists
+- [ ] Create `.env` file (copy from .env.example)
+- [x] Implement `src/config.ts` with Zod validation ✅ config.ts implemented
+- [x] Configure `tsconfig.json` ✅ tsconfig.json configured
+- [x] Test config loading
+
+### Phase 2: PocketBase Setup & Schema (Days 5-6) ✅ COMPLETED
+- [x] Create `.env` file (copy from .env.example) ✅ Created
+- [x] Create `scripts/setup-pocketbase.ts` ✅ Implemented with REST API approach
+- [x] Implement PocketBase admin authentication ✅ Working via REST API
+- [x] Create `incidents` collection with schema ✅ Created with simplified fields
+- [x] Create `solutions` collection with schema ✅ Created with text-based relations
+- [x] Create `lessons_learned` collection with schema ✅ Created
+- [x] Create `tags` collection with schema ✅ Created
+- [x] Create `feedback` collection with schema ✅ Created
+- [x] Implement `src/db/pocketbase.ts` client module ✅ Updated with REST API auth
+- [x] Test PocketBase connection ✅ All CRUD operations working
+- [x] Run setup script successfully (`bun run setup:pocketbase`) ✅ Collections created
+- [x] Create `scripts/test-connection.ts` ✅ Comprehensive test script
+
+**Schema Updates**: Used simplified approach (text fields instead of complex select/json/relation types) for better compatibility
+
+### Phase 3: MCP Server Core (Days 7-10)
+- [ ] Implement `src/index.ts` server entry point ⚠️ File exists but empty
+- [ ] Create `src/mcp/tools.ts` with all 7 tool definitions ⚠️ File exists but empty
+- [ ] Register `create_incident` tool
+- [ ] Register `search_incidents` tool
+- [ ] Register `add_solution` tool
+- [ ] Register `extract_lessons` tool
+- [ ] Register `get_similar_incidents` tool
+- [ ] Register `update_incident_status` tool
+- [ ] Register `export_knowledge` tool
+- [ ] Create `src/mcp/resources.ts` with 3 resources ⚠️ File exists but empty
+- [ ] Register `incident://recent` resource
+- [ ] Register `incident://by-category` resource
+- [ ] Register `incident://stats` resource
+- [ ] Create `src/mcp/prompts.ts` with 3 prompts ⚠️ File exists but empty
+- [ ] Register `troubleshoot` prompt
+- [ ] Register `document_solution` prompt
+- [ ] Register `analyze_pattern` prompt
+- [ ] Test MCP server starts without errors
+
+### Phase 4: Tool Handlers Implementation (Days 11-14)
+- [ ] Create `src/mcp/handlers.ts` ⚠️ File exists but empty
+- [ ] Implement `handleCreateIncident` with validation
+- [ ] Implement `handleSearchIncidents` with keyword search
+- [ ] Implement `handleAddSolution` with step validation
+- [ ] Implement `handleExtractLessons` with root cause update
+- [ ] Implement `handleGetSimilarIncidents` (keyword-based)
+- [ ] Implement `handleUpdateIncidentStatus` with resolved_at
+- [ ] Implement `handleExportKnowledge` (JSON, CSV, Markdown)
+- [ ] Add error handling to all handlers
+- [ ] Test each handler individually
+
+### Phase 5: Testing & Integration (Days 15-18)
+- [ ] Create `tests/mcp/tools.test.ts`
+- [ ] Write test for `handleCreateIncident`
+- [ ] Write test for `handleSearchIncidents`
+- [ ] Create `scripts/test-manual.ts` manual testing script
+- [ ] Test PocketBase connection manually
+- [ ] Test creating test incident
+- [ ] Test searching incidents
+- [ ] Run all unit tests (`bun test`)
+- [ ] Verify end-to-end workflow works
+
+### Phase 6: Cursor IDE Integration (Days 19-21)
+- [ ] Configure Cursor MCP settings (`~/.cursor/mcp.json`)
+- [ ] Set correct `cwd` path in Cursor config
+- [ ] Add environment variables to Cursor config
+- [ ] Start PocketBase server (`bun run pb:serve`)
+- [ ] Restart Cursor IDE
+- [ ] Verify MCP server connects in Cursor
+- [ ] Test `create_incident` tool in Cursor
+- [ ] Test `search_incidents` tool in Cursor
+- [ ] Test all 7 tools work in Cursor
+- [ ] Test all 3 resources work in Cursor
+- [ ] Test all 3 prompts work in Cursor
+- [ ] Create `scripts/start-dev.sh` startup script
+
+### Phase 7: Performance Optimization & Polish (Days 22-28)
+- [ ] Create `src/utils/performance.ts` with `measureTime` ⚠️ File exists but empty
+- [ ] Create `src/utils/logger.ts` with Logger class ⚠️ File exists but empty
+- [ ] Create `src/utils/errors.ts` with custom error classes ⚠️ File exists but empty
+- [ ] Add performance monitoring to handlers
+- [ ] Add logging throughout codebase
+- [ ] Verify startup time < 500ms
+- [ ] Verify query time < 300ms
+- [ ] Test memory footprint < 50MB
+- [ ] Check bundle size < 10MB
+- [ ] Review and fix any linter errors
+- [ ] Update documentation
+
+### Success Criteria Verification
+- [ ] MCP server starts within 500ms via Bun
+- [ ] Cursor connects and lists available tools instantly
+- [ ] Create incident tool works end-to-end (< 100ms)
+- [ ] Search returns relevant results within 300ms
+- [ ] Can add solution & extract lessons (< 100ms each)
+- [ ] 10+ test incidents stored successfully
+- [ ] No data loss on restart
+- [ ] Cursor can autocomplete based on stored knowledge
+- [ ] Memory footprint stays under 50MB during operation
+- [ ] Bun bundle size under 10MB
+
+---
+
+## 📊 Progress Summary
+
+**Last Updated**: 2025-01-XX
+
+### ✅ Completed (Phase 0-1: ~60%)
+- **Phase 0**: Environment Setup - **7/7 tasks** (100%) ✅
+  - Bun installed, PocketBase downloaded, project structure created
+- **Phase 1**: Core Infrastructure - **5/7 tasks** (71%) ✅
+  - Configuration files done, missing .env file and config testing
+
+### ⚠️ In Progress (Phase 2-7: ~0%)
+- **Phase 2**: PocketBase Setup - **0/10 tasks** (0%)
+  - Files created but empty, need implementation
+- **Phase 3**: MCP Server Core - **0/19 tasks** (0%)
+  - Files created but empty, need implementation
+- **Phase 4**: Tool Handlers - **0/10 tasks** (0%)
+  - Files created but empty, need implementation
+- **Phase 5**: Testing - **0/9 tasks** (0%)
+- **Phase 6**: Cursor Integration - **0/12 tasks** (0%)
+- **Phase 7**: Performance & Polish - **0/12 tasks** (0%)
+  - Files created but empty, need implementation
+
+### 📈 Overall Progress: ~12% (12/79 tasks completed)
+
+**Next Steps**:
+1. Create `.env` file from `.env.example`
+2. Implement `scripts/setup-pocketbase.ts` (Phase 2)
+3. Implement `src/db/pocketbase.ts` (Phase 2)
+4. Implement `src/index.ts` and MCP server core (Phase 3)
+
+---
+
 ## Phase 0: Environment Setup (Day 1)
 
 ### 0.1 Install Required Tools
