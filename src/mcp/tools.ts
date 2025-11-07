@@ -22,10 +22,15 @@ import { logger, startTimer } from '../utils/logger.js';
 import { performanceMonitor } from '../utils/performance.js';
 import { responseCache } from '../utils/cache.js';
 
-const TOOLS: Tool[] = [
+type ToolDefinition = Tool & {
+  specPath: string;
+};
+
+const TOOL_DEFINITIONS: ToolDefinition[] = [
   {
     name: 'create_incident',
-    description: 'Create a new incident record for troubleshooting. Returns incident ID and suggests similar incidents.',
+    description: 'Create a structured incident record and surface the new PocketBase ID. Docs: docs/specs/tools/create_incident.md',
+    specPath: 'docs/specs/tools/create_incident.md',
     inputSchema: {
       type: 'object',
       properties: {
@@ -77,7 +82,8 @@ const TOOLS: Tool[] = [
   },
   {
     name: 'search_incidents',
-    description: 'Search existing incidents and solutions. Supports keyword search with filters.',
+    description: 'Search incidents with keyword and enum filters for rapid triage. Docs: docs/specs/tools/search_incidents.md',
+    specPath: 'docs/specs/tools/search_incidents.md',
     inputSchema: {
       type: 'object',
       properties: {
@@ -113,7 +119,8 @@ const TOOLS: Tool[] = [
   },
   {
     name: 'add_solution',
-    description: 'Add a solution to an existing incident with step-by-step instructions.',
+    description: 'Attach a solution record with step-by-step remediation details. Docs: docs/specs/tools/add_solution.md',
+    specPath: 'docs/specs/tools/add_solution.md',
     inputSchema: {
       type: 'object',
       properties: {
@@ -155,7 +162,8 @@ const TOOLS: Tool[] = [
   },
   {
     name: 'extract_lessons',
-    description: 'Extract and document lessons learned from an incident.',
+    description: 'Log a lessons-learned entry and update the source incident root cause. Docs: docs/specs/tools/extract_lessons.md',
+    specPath: 'docs/specs/tools/extract_lessons.md',
     inputSchema: {
       type: 'object',
       properties: {
@@ -187,7 +195,8 @@ const TOOLS: Tool[] = [
   },
   {
     name: 'get_similar_incidents',
-    description: 'Find similar incidents based on content similarity and category.',
+    description: 'Suggest incidents with overlapping signals to reuse fixes. Docs: docs/specs/tools/get_similar_incidents.md',
+    specPath: 'docs/specs/tools/get_similar_incidents.md',
     inputSchema: {
       type: 'object',
       properties: {
@@ -208,7 +217,8 @@ const TOOLS: Tool[] = [
   },
   {
     name: 'update_incident_status',
-    description: 'Update the status of an incident (open, investigating, resolved, archived).',
+    description: 'Move an incident through its lifecycle and record resolution timestamps. Docs: docs/specs/tools/update_incident_status.md',
+    specPath: 'docs/specs/tools/update_incident_status.md',
     inputSchema: {
       type: 'object',
       properties: {
@@ -231,7 +241,8 @@ const TOOLS: Tool[] = [
   },
   {
     name: 'export_knowledge',
-    description: 'Export knowledge base in various formats (JSON, CSV, Markdown).',
+    description: 'Export the knowledge base in JSON, CSV, or Markdown for sharing. Docs: docs/specs/tools/export_knowledge.md',
+    specPath: 'docs/specs/tools/export_knowledge.md',
     inputSchema: {
       type: 'object',
       properties: {
@@ -264,6 +275,12 @@ const TOOLS: Tool[] = [
     }
   },
 ];
+
+const TOOL_SUMMARIES = TOOL_DEFINITIONS.map(({ name, description, specPath }) => ({
+  name,
+  briefDescription: description,
+  specPath,
+}));
 
 // Rate limiting for tool calls
 const rateLimiter = new Map<string, { count: number; resetTime: number }>();
@@ -348,10 +365,10 @@ export function registerTools(server: Server) {
   // List available tools
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     const endTimer = startTimer('list_tools');
-    logger.info('Tools list requested', { toolCount: TOOLS.length });
+    logger.info('Tools list requested', { toolCount: TOOL_DEFINITIONS.length });
 
     try {
-      const result = { tools: TOOLS };
+      const result = { tools: TOOL_SUMMARIES } as any;
       endTimer();
       return result;
     } catch (error) {
