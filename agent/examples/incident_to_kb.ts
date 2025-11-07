@@ -248,3 +248,20 @@ export default {
   runDemo,
   demonstrateToolDiscovery
 };
+
+// Run demo if called directly
+if (import.meta.main) {
+  const command = process.argv[2];
+
+  if (command === 'demo') {
+    await runDemo();
+  } else if (command === 'discover') {
+    const taskDescription = process.argv[3] || 'incident management';
+    demonstrateToolDiscovery(taskDescription);
+  } else {
+    console.log('Usage:');
+    console.log('  bun agent/examples/incident_to_kb.ts demo          # Run demo workflow');
+    console.log('  bun agent/examples/incident_to_kb.ts discover <task> # Show tool discovery for task');
+    process.exit(1);
+  }
+}

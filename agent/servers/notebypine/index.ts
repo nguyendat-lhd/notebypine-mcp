@@ -19,6 +19,12 @@ export type { AddSolutionInput } from './addSolution.js';
 export { extractLessons } from './extractLessons.js';
 export type { ExtractLessonsInput, LessonType } from './extractLessons.js';
 
+export { getSimilarIncidents } from './getSimilarIncidents.js';
+export type { GetSimilarIncidentsInput, SimilarIncident } from './getSimilarIncidents.js';
+
+export { updateIncidentStatus } from './updateIncidentStatus.js';
+export type { UpdateIncidentStatusInput } from './updateIncidentStatus.js';
+
 export { exportKnowledge } from './exportKnowledge.js';
 export type {
   ExportKnowledgeFilter,

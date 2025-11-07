@@ -185,6 +185,153 @@ Once configured in your MCP client, you can use the tools through natural langua
 - "Add a solution to incident ID abc123"
 - "Export all resolved incidents as markdown"
 
+## 📋 Run in Code Mode (Enhanced Workflow)
+
+This MCP server supports **Code Mode** orchestration for improved token efficiency, observability, and developer ergonomics. Code Mode moves orchestration from prompt context to hosted code, providing better performance and security.
+
+### Why Code Mode?
+
+- **~98% Token Reduction**: Move orchestration logic out of LLM context
+- **Enhanced Security**: Built-in redaction and secure logging
+- **Better Observability**: Structured logging and metrics
+- **Improved Performance**: Chunked processing and caching
+- **Developer Experience**: Rich tooling and debugging capabilities
+
+### Quick Setup for Code Mode
+
+#### 1. Enable Code Mode in Cursor
+
+1. **Enable Code Execution**:
+   - Open Cursor Settings → AI Features
+   - Enable "Code Execution"
+   - Allow repository read/write access
+
+2. **Update MCP Configuration**:
+```json
+{
+  "mcpServers": {
+    "notebypine": {
+      "command": "bun",
+      "args": ["/path/to/notebypine-mcp/src/index.ts"],
+      "env": {
+        "POCKETBASE_URL": "http://localhost:8090",
+        "POCKETBASE_ADMIN_EMAIL": "admin@example.com",
+        "POCKETBASE_ADMIN_PASSWORD": "admin123456"
+      },
+      "codeMode": true
+    }
+  }
+}
+```
+
+3. **Load the Project**:
+   - Open the notebypine-mcp repository in Cursor
+   - The `.cursorrules` file will automatically guide agents to use Code Mode
+
+#### 2. Enable Code Mode in Claude Desktop
+
+```json
+{
+  "mcpServers": {
+    "notebypine": {
+      "command": "bun",
+      "args": ["/path/to/notebypine-mcp/src/index.ts"],
+      "env": {
+        "POCKETBASE_URL": "http://localhost:8090",
+        "POCKETBASE_ADMIN_EMAIL": "admin@example.com",
+        "POCKETBASE_ADMIN_PASSWORD": "admin123456"
+      },
+      "codeMode": true
+    }
+  }
+}
+```
+
+### Code Mode Workflow
+
+#### 1. Tool Discovery (Recommended First Step)
+```typescript
+import { searchTools } from './agent/helpers/searchTools.js';
+
+// Find relevant tools
+const tools = searchTools("incident|solution|export");
+console.log(tools); // Shows best tools for your task
+```
+
+#### 2. Route Calls Through Helper Stack
+```typescript
+import { routeCall } from './agent/helpers/router.js';
+
+// Automatic routing with fallback
+const result = await routeCall('notebypine', 'create_incident', {
+  title: 'Database timeout issue',
+  category: 'Backend',
+  severity: 'high'
+});
+```
+
+#### 3. Use Skills for Complex Operations
+```typescript
+import { triageFromLogfile } from './agent/skills/triageFromLogfile.js';
+import { saveSheetAsCSV } from './agent/skills/saveSheetAsCSV.js';
+
+// Log triage workflow
+const triageResult = await triageFromLogfile(logContent);
+
+// Export to CSV
+const csvResult = saveSheetAsCSV(data, 'incidents', './out/incidents.csv');
+```
+
+### Available Scripts
+
+```bash
+# Run Code Mode demo
+bun run agent:demo
+
+# Run end-to-end tests
+bun run agent:test
+
+# Validate routing configuration
+bun run agent:validate
+
+# Show routing metrics
+bun run agent:metrics
+```
+
+### Code Mode Architecture
+
+```
+agent/
+├── helpers/                    # Orchestration helpers
+│   ├── callMCPTool.ts         # Enhanced MCP tool calls
+│   ├── searchTools.ts         # Tool discovery
+│   ├── router.ts              # Intelligent routing
+│   └── redact.ts              # Security & redaction
+├── servers/notebypine/         # Tool wrappers
+│   ├── createIncident.ts
+│   ├── searchIncidents.ts
+│   └── ...
+├── skills/                     # Reusable workflows
+│   ├── triageFromLogfile.ts   # Log analysis
+│   └── saveSheetAsCSV.ts      # CSV export
+└── examples/                   # End-to-end demos
+    └── incident_to_kb.ts      # Complete workflow
+```
+
+### Configuration Files
+
+- **`mcp.routing.json`**: Routing configuration and server capabilities
+- **`.cursorrules`**: Agent guidance for Code Mode workflow
+- **Agent helpers**: Automatic tool discovery and secure orchestration
+
+### Benefits for Developers
+
+1. **Token Efficiency**: Orchestration logic lives in code, not prompts
+2. **Security**: Automatic redaction of sensitive data
+3. **Observability**: Structured logging and performance metrics
+4. **Flexibility**: Easy to add new skills and modify workflows
+5. **Testing**: Complete test coverage for all orchestration logic
+
 ## Development
 
 ### Project Structure

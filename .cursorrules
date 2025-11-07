@@ -1,0 +1,90 @@
+# Notebypine MCP - Code Mode Rules
+
+## Primary Workflow: Code Mode Orchestration
+
+When working with this codebase and MCP server, ALWAYS follow this pattern:
+
+### 1. Tool Discovery First
+- Use `agent/helpers/searchTools.ts` to discover appropriate tools before calling them
+- Search with keywords like "incident", "solution", "export", "search" to find relevant tools
+- Always check tool relevance scores and pick the highest-rated ones
+
+### 2. Route Through Helper Stack
+- NEVER call MCP tools directly - ALWAYS use `agent/helpers/callMCPTool.ts`
+- Use `agent/helpers/router.ts` for automatic routing decisions
+- All calls should go through the wrapper functions, not direct MCP invocation
+
+### 3. Security & Logging
+- All logging is automatically redacted via `agent/helpers/redact.ts`
+- Never log raw payloads or sensitive data
+- Use sample-size logging (default 5-10 rows) for large datasets
+- Enable verbose mode only when explicitly requested
+
+### 4. Use Skills for Complex Workflows
+- For log analysis: Use `agent/skills/triageFromLogfile.ts`
+- For CSV exports: Use `agent/skills/saveSheetAsCSV.ts`
+- For end-to-end workflows: Use `agent/examples/incident_to_kb.ts`
+
+## Code Mode Best Practices
+
+### File Structure
+```
+agent/
+├── helpers/          # Reusable orchestration helpers
+├── servers/notebypine/  # Tool wrappers (one per tool)
+├── skills/           # Reusable operational flows
+└── examples/         # End-to-end demonstrations
+```
+
+### Import Patterns
+```typescript
+// ✅ GOOD: Route through helpers
+import { callMCPTool } from '../helpers/callMCPTool.js';
+import { searchTools } from '../helpers/searchTools.js';
+import { routeCall } from '../helpers/router.js';
+
+// ❌ AVOID: Direct MCP calls
+// import { mcp } from '@modelcontextprotocol/sdk';
+```
+
+### Typical Workflow
+1. **Discovery**: `searchTools("incident|solution|export")`
+2. **Import**: Import only required wrappers
+3. **Execute**: Use `callMCPTool()` or `routeCall()`
+4. **Log**: Summaries are automatically logged (top 3 rows/items)
+
+## Agent Instructions
+
+When helping users with incident management or knowledge base tasks:
+
+1. **Always start with tool discovery**
+2. **Use the helper stack for all operations**
+3. **Prefer sample-sized logging** for large datasets
+4. **Leverage existing skills** for common patterns
+5. **Follow the progressive disclosure flow** - don't expose complexity unless needed
+
+## Prohibited Patterns
+
+- ❌ Direct MCP tool invocation
+- ❌ Logging raw request/response payloads
+- ❌ Bypassing the redaction layer
+- ❌ Logging raw request/response
+- ❌ Direct MCP tool invocation
+- ❌ Hard-coding tool logic in agent responses
+- ❌ Creating new tool wrappers outside `agent/servers/`
+
+## Error Handling
+
+- Always use the structured error handling from `callMCPTool`
+- Log errors through the redaction layer
+- Provide user-friendly error messages
+- Suggest alternative tools or approaches when tools fail
+
+## Performance Guidelines
+
+- Use chunking for large datasets (> 50 items)
+- Default to sample-size logging
+- Cache tool discovery results when possible
+- Batch operations when tools support it
+
+Remember: The goal is token efficiency and clean orchestration through the helper stack, not direct MCP manipulation.

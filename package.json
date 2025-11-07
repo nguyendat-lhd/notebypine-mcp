@@ -19,7 +19,11 @@
     "pb:serve": "./pocketbase serve --dir ./pb_data",
     "setup:pocketbase": "bun scripts/setup-pocketbase.ts",
     "test": "bun test",
-    "test:mcp": "bun test tests/mcp/"
+    "test:mcp": "bun test tests/mcp/",
+    "agent:demo": "bun agent/examples/incident_to_kb.ts demo",
+    "agent:test": "bun scripts/agent-e2e-test.ts",
+    "agent:validate": "bun scripts/agent-validate.ts",
+    "agent:metrics": "bun scripts/agent-metrics.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",

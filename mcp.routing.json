@@ -1,0 +1,95 @@
+{
+  "version": "1.0.0",
+  "description": "MCP Server routing configuration for Code Mode workflow",
+  "defaultMode": "auto",
+  "servers": {
+    "notebypine": {
+      "mode": "code",
+      "capabilities": {
+        "supportsWrapper": true,
+        "supportsDirect": true,
+        "supportsChunking": true,
+        "supportsRedaction": true,
+        "preferredMode": "code"
+      },
+      "toolRouting": {
+        "create_incident": {
+          "mode": "code",
+          "wrapper": "agent/servers/notebypine/createIncident.ts",
+          "chunking": false,
+          "redaction": true
+        },
+        "search_incidents": {
+          "mode": "code",
+          "wrapper": "agent/servers/notebypine/searchIncidents.ts",
+          "chunking": true,
+          "redaction": true
+        },
+        "add_solution": {
+          "mode": "code",
+          "wrapper": "agent/servers/notebypine/addSolution.ts",
+          "chunking": false,
+          "redaction": true
+        },
+        "extract_lessons": {
+          "mode": "code",
+          "wrapper": "agent/servers/notebypine/extractLessons.ts",
+          "chunking": false,
+          "redaction": true
+        },
+        "get_similar_incidents": {
+          "mode": "code",
+          "wrapper": "agent/servers/notebypine/getSimilarIncidents.ts",
+          "chunking": true,
+          "redaction": true
+        },
+        "update_incident_status": {
+          "mode": "code",
+          "wrapper": "agent/servers/notebypine/updateIncidentStatus.ts",
+          "chunking": false,
+          "redaction": true
+        },
+        "export_knowledge": {
+          "mode": "code",
+          "wrapper": "agent/servers/notebypine/exportKnowledge.ts",
+          "chunking": true,
+          "redaction": false
+        }
+      },
+      "defaultOptions": {
+        "enableChunking": true,
+        "chunkSize": 10,
+        "sampleSize": 5,
+        "verbose": false,
+        "redactSensitive": true
+      },
+      "logging": {
+        "level": "info",
+        "includeTimestamps": true,
+        "includeToolNames": true,
+        "includeSampleData": true
+      }
+    }
+  },
+  "globalSettings": {
+    "autoDiscovery": true,
+    "preferWrapperRoutes": true,
+    "fallbackToDirect": true,
+    "enableMetrics": true,
+    "cacheToolList": true,
+    "cacheTTL": 300000
+  },
+  "developerMode": {
+    "enabled": false,
+    "verboseLogging": false,
+    "showRoutingDecisions": false,
+    "enableDebugTools": false
+  },
+  "workflowDefaults": {
+    "maxIncidentBatchSize": 5,
+    "maxSearchResults": 50,
+    "defaultExportFormat": "json",
+    "defaultVisibility": "team",
+    "defaultSeverity": "medium"
+  }
+}
