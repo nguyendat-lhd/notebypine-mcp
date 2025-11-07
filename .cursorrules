@@ -62,6 +62,8 @@ When helping users with incident management or knowledge base tasks:
 3. **Prefer sample-sized logging** for large datasets
 4. **Leverage existing skills** for common patterns
 5. **Follow the progressive disclosure flow** - don't expose complexity unless needed
+6. **CRITICAL: Always use PocketBase for data** - Never suggest or implement mock data fallbacks
+7. **Ensure PocketBase is running** - API server requires PocketBase connection before starting
 
 ## Prohibited Patterns
 
@@ -72,6 +74,84 @@ When helping users with incident management or knowledge base tasks:
 - ❌ Direct MCP tool invocation
 - ❌ Hard-coding tool logic in agent responses
 - ❌ Creating new tool wrappers outside `agent/servers/`
+- ❌ **Using mock data or fallback data sources**
+- ❌ **Returning hardcoded data instead of querying PocketBase**
+- ❌ **Creating fallback mechanisms that bypass PocketBase**
+
+## Data Requirements: PocketBase Only
+
+### Mandatory PocketBase Integration
+
+**CRITICAL RULE**: All data MUST come from PocketBase. No exceptions.
+
+- ✅ **ALWAYS** query PocketBase for all data operations
+- ✅ **ALWAYS** ensure PocketBase is running before starting API server
+- ✅ **ALWAYS** handle PocketBase connection errors gracefully with proper error messages
+- ❌ **NEVER** use mock data, hardcoded data, or fallback data sources
+- ❌ **NEVER** create routes that return mock data when PocketBase is unavailable
+- ❌ **NEVER** import or use `mockData.ts` in production code paths
+
+### API Server Requirements
+
+When working with `api/` directory:
+
+1. **Database Connection**: 
+   - API server MUST verify PocketBase connection before starting
+   - If PocketBase is not available, server SHOULD fail to start with clear error message
+   - DO NOT start server in degraded mode without database
+
+2. **Route Handlers**:
+   - All route handlers MUST query PocketBase directly
+   - Return proper HTTP error codes (503 Service Unavailable) if PocketBase is down
+   - DO NOT fallback to mock data in any route handler
+
+3. **Error Handling**:
+   - When PocketBase is unavailable, return: `503 Service Unavailable` with message "Database connection required"
+   - DO NOT silently fallback to mock data
+   - Log errors clearly indicating PocketBase connection issues
+
+### Code Examples
+
+```typescript
+// ✅ CORRECT: Query PocketBase, fail if unavailable
+async getIncidents(req, res) {
+  const dbService = req.app.locals.dbService;
+  
+  if (!dbService || !(await dbService.testConnection())) {
+    return res.status(503).json({
+      success: false,
+      error: 'Database connection required. Please ensure PocketBase is running.'
+    });
+  }
+  
+  const result = await dbService.getIncidents('', page, limit);
+  res.json({ success: true, data: result.items });
+}
+
+// ❌ WRONG: Fallback to mock data
+async getIncidents(req, res) {
+  try {
+    const result = await dbService.getIncidents('', page, limit);
+    res.json({ success: true, data: result.items });
+  } catch (error) {
+    // ❌ DO NOT DO THIS
+    const { mockIncidents } = await import('../config/mockData.js');
+    res.json({ success: true, data: mockIncidents });
+  }
+}
+```
+
+### Mock Data Usage
+
+- Mock data files (`mockData.ts`) are ONLY for:
+  - Unit tests
+  - Development documentation/examples
+  - Type definitions and schemas
+- Mock data MUST NOT be used in:
+  - API route handlers
+  - Production code paths
+  - Error fallback mechanisms
+  - Development server responses
 
 ## Error Handling
 

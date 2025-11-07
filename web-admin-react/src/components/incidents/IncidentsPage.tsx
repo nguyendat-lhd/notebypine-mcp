@@ -44,7 +44,7 @@ const IncidentsPage: FC = () => {
     title: '',
     description: '',
     severity: 'medium',
-    status: 'open',
+    status: 'new',
   });
 
   useEffect(() => {

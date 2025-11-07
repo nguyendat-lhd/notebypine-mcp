@@ -3,6 +3,7 @@ import { LoginForm } from '@/components/auth/LoginForm';
 import { Layout } from '@/components/layout/Layout';
 import { Dashboard } from '@/components/dashboard/Dashboard';
 import IncidentsPage from '@/components/incidents/IncidentsPage';
+import SolutionsPage from '@/components/solutions/SolutionsPage';
 import type { PageType, User } from '@/types';
 import apiService from '@/services/api';
 
@@ -43,15 +44,7 @@ function App() {
       case 'incidents':
         return <IncidentsPage />;
       case 'solutions':
-        return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Solutions</h1>
-            <p className="text-muted-foreground">View and manage solutions</p>
-            <div className="p-8 text-center border-2 border-dashed border-border rounded-lg">
-              <p className="text-muted-foreground">Solutions management coming soon...</p>
-            </div>
-          </div>
-        );
+        return <SolutionsPage />;
       case 'knowledge':
         return (
           <div className="space-y-6">

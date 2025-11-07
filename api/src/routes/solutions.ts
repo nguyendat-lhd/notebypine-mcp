@@ -13,64 +13,26 @@ router.get(
     const { page = 1, limit = 20 } = req.query as any;
     const dbService = req.app.locals.dbService;
 
+    // Check if database is available
+    if (!dbService || !(await dbService.testConnection())) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection required. Please ensure PocketBase is running.'
+      });
+    }
+
     try {
-      // Check if database is available
-      if (dbService && await dbService.testConnection()) {
-        const result = await dbService.getSolutions('', page, limit);
+      const result = await dbService.getSolutions('', page, limit);
 
-        res.json({
-          success: true,
-          data: result.items,
-          pagination: {
-            page: result.page,
-            perPage: result.perPage,
-            totalItems: result.totalItems,
-            totalPages: result.totalPages
-          }
-        });
-      } else {
-        // Return mock data when database is not available
-        const { mockSolutions } = await import('../config/mockData.js');
-        const pageNum = parseInt(page.toString());
-        const limitNum = parseInt(limit.toString());
-        const startIndex = (pageNum - 1) * limitNum;
-        const endIndex = startIndex + limitNum;
-        const paginatedSolutions = mockSolutions.slice(startIndex, endIndex);
-
-        res.json({
-          success: true,
-          data: paginatedSolutions,
-          pagination: {
-            page: pageNum,
-            perPage: limitNum,
-            totalItems: mockSolutions.length,
-            totalPages: Math.ceil(mockSolutions.length / limitNum)
-          }
-        });
-      }
+      res.json({
+        success: true,
+        data: {
+          items: result.items,
+          total: result.totalItems
+        }
+      });
     } catch (error) {
-      // Fallback to mock data on any error
-      try {
-        const { mockSolutions } = await import('../config/mockData.js');
-        const pageNum = parseInt(page.toString());
-        const limitNum = parseInt(limit.toString());
-        const startIndex = (pageNum - 1) * limitNum;
-        const endIndex = startIndex + limitNum;
-        const paginatedSolutions = mockSolutions.slice(startIndex, endIndex);
-
-        res.json({
-          success: true,
-          data: paginatedSolutions,
-          pagination: {
-            page: pageNum,
-            perPage: limitNum,
-            totalItems: mockSolutions.length,
-            totalPages: Math.ceil(mockSolutions.length / limitNum)
-          }
-        });
-      } catch (mockError) {
-        throw new AppException('Failed to fetch solutions', 500);
-      }
+      throw new AppException('Failed to fetch solutions', 500);
     }
   })
 );

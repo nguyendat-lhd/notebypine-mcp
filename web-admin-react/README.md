@@ -43,7 +43,7 @@ A modern React-based admin dashboard built with Bun, TypeScript, Tailwind CSS, a
 
 ### Prerequisites
 - Node.js 18+ or Bun 1.3+
-- PocketBase server running on http://localhost:8090
+- PocketBase server running on http://localhost:8090 (optional)
 - NoteByPine API server running on http://localhost:3000
 
 ### Installation

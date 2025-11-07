@@ -45,7 +45,7 @@ export const schemas = {
     title: Joi.string().required().min(3).max(200),
     description: Joi.string().required().min(10),
     severity: Joi.string().valid('low', 'medium', 'high', 'critical').required(),
-    status: Joi.string().valid('new', 'investigating', 'resolved', 'closed').default('new'),
+    status: Joi.string().valid('new', 'open', 'investigating', 'resolved', 'closed').default('new'),
     tags: Joi.array().items(Joi.string()).default([]),
     assignedTo: Joi.string().optional(),
     source: Joi.string().optional(),

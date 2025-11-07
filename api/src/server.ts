@@ -26,6 +26,7 @@ class NoteByPineServer {
   private server: any;
   private dbService: DatabaseService;
   private authMiddleware: AuthMiddleware;
+  private isDatabaseAvailable: boolean = false;
 
   constructor() {
     this.app = express();
@@ -35,7 +36,7 @@ class NoteByPineServer {
     this.dbService = new DatabaseService({
       url: process.env.POCKETBASE_URL || 'http://127.0.0.1:8090',
       adminEmail: process.env.POCKETBASE_ADMIN_EMAIL || 'admin@example.com',
-      adminPassword: process.env.POCKETBASE_ADMIN_PASSWORD || 'password'
+      adminPassword: process.env.POCKETBASE_ADMIN_PASSWORD || 'admin123456'
     });
 
     this.authMiddleware = new AuthMiddleware(process.env.JWT_SECRET || 'default-secret');
@@ -121,29 +122,15 @@ class NoteByPineServer {
       });
     });
 
-    // Static files serving (serve the existing HTML)
-    const staticPath = path.join(process.cwd(), '..', 'docs', 'html');
-    if (fs.existsSync(staticPath)) {
-      this.app.use(express.static(staticPath));
-      console.log(`📁 Serving static files from: ${staticPath}`);
-    } else {
-      console.log(`⚠️  Static files directory not found: ${staticPath}`);
-    }
-
     // API routes
     this.app.use('/', apiRoutes);
 
-    // Default route for SPA (serve index.html)
+    // 404 handler for unknown routes
     this.app.get('*', (req, res) => {
-      const indexPath = path.join(staticPath, 'index.html');
-      if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath);
-      } else {
-        res.status(404).json({
-          success: false,
-          error: 'Page not found'
-        });
-      }
+      res.status(404).json({
+        success: false,
+        error: 'API endpoint not found'
+      });
     });
 
     // Authentication endpoint with fallback for development
@@ -226,21 +213,35 @@ class NoteByPineServer {
 
   public async start() {
     try {
-      // Initialize database connection
-      console.log('🔌 Connecting to PocketBase with updated credentials...');
+      // Initialize database connection - REQUIRED before starting server
+      console.log('🔌 Connecting to PocketBase...');
+      const pocketbaseUrl = process.env.POCKETBASE_URL || 'http://127.0.0.1:8090';
+      console.log(`   PocketBase URL: ${pocketbaseUrl}`);
 
-      // Skip authentication for now if PocketBase is not available
+      // CRITICAL: PocketBase connection is REQUIRED - fail if not available
       try {
-        await this.dbService.authenticate();
+        const authenticated = await this.dbService.authenticate();
+        if (!authenticated) {
+          throw new Error('PocketBase authentication failed');
+        }
+
         const dbConnected = await this.dbService.testConnection();
         if (!dbConnected) {
-          console.log('⚠️  PocketBase not available, continuing without database...');
-        } else {
-          console.log('✅ PocketBase connection established');
+          throw new Error('PocketBase connection test failed');
         }
-      } catch (error) {
-        console.log('⚠️  PocketBase authentication failed, continuing without database...');
-        console.log('   Make sure PocketBase is running on http://localhost:8090');
+
+        this.isDatabaseAvailable = true;
+        console.log('✅ PocketBase connection established');
+      } catch (error: any) {
+        console.error('❌ PocketBase connection failed:', error.message || error);
+        console.error('');
+        console.error('📋 To start PocketBase:');
+        console.error('   1. Run: bun run pb:serve');
+        console.error('   2. Or: ./pocketbase serve --dir ./pb_data');
+        console.error('');
+        console.error('💡 Make sure PocketBase is running on:', pocketbaseUrl);
+        console.error('   Database connection is REQUIRED. Server cannot start without PocketBase.');
+        process.exit(1);
       }
 
       // Setup WebSocket
@@ -251,11 +252,11 @@ class NoteByPineServer {
       // Start HTTP server
       const port = process.env.PORT || 3000;
       this.server.listen(port, () => {
-        console.log(`🚀 NoteByPine Web Admin Server started successfully!`);
+        console.log(`🚀 NoteByPine API Server started successfully!`);
         console.log(`📍 Server running at: http://localhost:${port}`);
         console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
         console.log(`📊 WebSocket endpoint: ws://localhost:${port}/ws`);
-        console.log(`📁 Static files: http://localhost:${port}/index.html`);
+        console.log(`🔌 API endpoint: http://localhost:${port}/api/v1`);
       });
 
       // Graceful shutdown
@@ -291,4 +292,6 @@ server.start().catch((error) => {
   process.exit(1);
 });
 
-export default server;
+// Export server instance for testing purposes only
+// Note: Bun may try to auto-detect this as a server, but we're using Express
+export { server };

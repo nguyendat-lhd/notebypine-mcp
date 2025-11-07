@@ -38,10 +38,16 @@ export interface Solution {
   id: string;
   title: string;
   description: string;
-  incidentId?: string;
+  steps: string[];
+  category: string;
   tags: string[];
+  verified: boolean;
+  incidentId?: string;
+  incident_id?: string;
   created: string;
   updated: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface KnowledgeItem {
