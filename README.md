@@ -30,17 +30,20 @@ Extract and place the `pocketbase` executable in the project root directory.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/notebypine-mcp.git
+git clone https://github.com/nguyendat-lhd/notebypine-mcp.git
 cd notebypine-mcp
 
 # Install dependencies
 bun install
 
-# Start PocketBase (in one terminal)
+# Start PocketBase (terminal 1)
 bun run pb:serve
 
-# Set up database (in another terminal)
+# Apply database migrations (terminal 2, one-time setup)
 bun run setup:pocketbase
+
+# Start the MCP server (terminal 3 or after PocketBase is ready)
+bun run dev
 ```
 
 Then configure your MCP client (Cursor/Claude Desktop) as described in the [Configuration](#configuration) section below.
@@ -49,11 +52,9 @@ Then configure your MCP client (Cursor/Claude Desktop) as described in the [Conf
 
 1. **Clone the repository**:
 ```bash
-git clone https://github.com/yourusername/notebypine-mcp.git
+git clone https://github.com/nguyendat-lhd/notebypine-mcp.git
 cd notebypine-mcp
 ```
-
-**Note**: Replace `yourusername` with your actual GitHub username or organization name.
 
 2. **Install dependencies**:
 ```bash
@@ -135,10 +136,10 @@ Replace `/path/to/notebypine-mcp` with the actual path to this repository.
 The MCP server runs via stdio transport and is typically started by the MCP client (Cursor/Claude Desktop). However, you can test it manually:
 
 ```bash
-# Development mode with watch
+# Development mode with watch (after PocketBase is running)
 bun run dev
 
-# Production mode
+# Production mode (expects PocketBase to be running)
 bun run start
 
 # Build for production
@@ -270,11 +271,18 @@ bun run setup:pocketbase
 
 ## License
 
-[Add your license here]
+This project is released under the [MIT License](./LICENSE).
 
 ## Contributing
 
-[Add contributing guidelines if applicable]
+Interested in contributing? Great! Please follow these steps:
+
+1. Fork the repository and create a feature branch.
+2. Install dependencies with `bun install` and make your changes.
+3. Run `bun test` to ensure the test suite passes.
+4. Open a pull request with a clear summary of the changes and context.
+
+We also welcome bug reports and feature ideas via GitHub issues.
 
 ## Support
 
