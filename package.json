@@ -20,10 +20,14 @@
     "setup:pocketbase": "bun scripts/setup-pocketbase.ts",
     "test": "bun test",
     "test:mcp": "bun test tests/mcp/",
+    "test:skills": "bun test tests/skills.test.ts",
+    "benchmark": "bun scripts/benchmark-code-mode.ts",
     "agent:demo": "bun agent/examples/incident_to_kb.ts demo",
     "agent:test": "bun scripts/agent-e2e-test.ts",
     "agent:validate": "bun scripts/agent-validate.ts",
-    "agent:metrics": "bun scripts/agent-metrics.ts"
+    "agent:metrics": "bun scripts/agent-metrics.ts",
+    "agent:audit": "bun scripts/agent-audit.ts",
+    "agent:feedback": "bun scripts/agent-feedback.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",

@@ -1,0 +1,96 @@
+{
+  "overallScore": 89,
+  "auditResults": [
+    {
+      "id": "audit_1762499889018_2ghcx41",
+      "timestamp": "2025-11-07T07:18:09.018Z",
+      "auditType": "redaction",
+      "status": "warning",
+      "score": 80,
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "ineffective-redaction",
+          "description": "4 test cases not properly redacted",
+          "fixRecommendation": "Review and improve redaction patterns"
+        }
+      ],
+      "summary": "Redaction coverage and effectiveness",
+      "recommendations": [],
+      "nextAuditDue": "2025-12-07T07:18:09.017Z"
+    },
+    {
+      "id": "audit_1762499889019_ckb87e0",
+      "timestamp": "2025-11-07T07:18:09.019Z",
+      "auditType": "logging",
+      "status": "warning",
+      "score": 75,
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "no-logging",
+          "description": "No logging found in helper file",
+          "location": "agent/helpers/searchTools.ts",
+          "fixRecommendation": "Add appropriate logging for debugging and monitoring"
+        },
+        {
+          "severity": "low",
+          "category": "insufficient-error-logging",
+          "description": "Error handling without proper logging",
+          "location": "agent/helpers/searchTools.ts",
+          "fixRecommendation": "Add proper error logging in try-catch blocks"
+        }
+      ],
+      "summary": "Logging hygiene and best practices",
+      "recommendations": [],
+      "nextAuditDue": "2025-12-07T07:18:09.019Z"
+    },
+    {
+      "id": "audit_1762499889023_rh7ik4c",
+      "timestamp": "2025-11-07T07:18:09.023Z",
+      "auditType": "security",
+      "status": "pass",
+      "score": 100,
+      "findings": [],
+      "summary": "Security practices and compliance",
+      "recommendations": [],
+      "nextAuditDue": "2026-02-05T07:18:09.023Z"
+    },
+    {
+      "id": "audit_1762499889023_6tco0uc",
+      "timestamp": "2025-11-07T07:18:09.023Z",
+      "auditType": "performance",
+      "status": "pass",
+      "score": 100,
+      "findings": [],
+      "summary": "Performance optimization and efficiency",
+      "recommendations": [],
+      "nextAuditDue": "2026-02-05T07:18:09.023Z"
+    },
+    {
+      "id": "audit_1762499889024_fowz9s4",
+      "timestamp": "2025-11-07T07:18:09.024Z",
+      "auditType": "compliance",
+      "status": "pass",
+      "score": 90,
+      "findings": [
+        {
+          "severity": "low",
+          "category": "low-test-coverage",
+          "description": "Low test coverage: 16%",
+          "fixRecommendation": "Increase test coverage to at least 50%"
+        }
+      ],
+      "summary": "Documentation and testing compliance",
+      "recommendations": [],
+      "nextAuditDue": "2026-02-05T07:18:09.024Z"
+    }
+  ],
+  "trends": {
+    "improving": [],
+    "declining": [],
+    "stable": []
+  },
+  "riskLevel": "low",
+  "actionItems": []
+}

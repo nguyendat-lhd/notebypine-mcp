@@ -1,0 +1,4 @@
+commas,id,newlines,quotes,slashes,text
+"Value, with, commas",1,"Line 1
+Line 2
+Line 3","Single ""double"" quotes",Path\to\file and /path/to/file,Special chars: áéíóú ñ 中文 🚀 emoji

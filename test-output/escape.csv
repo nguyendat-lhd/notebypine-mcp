@@ -1,0 +1,5 @@
+id,name,value
+1,"Test, with ""quotes""",100
+2,"Test
+with
+newlines",200

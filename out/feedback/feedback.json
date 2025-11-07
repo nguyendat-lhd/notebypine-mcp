@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Performance Issue - Slow Response",
+    "category": "performance",
+    "description": "The system is responding slowly. Details: The search tool is responding slowly when querying large datasets",
+    "severity": "medium",
+    "source": "cli",
+    "tags": [
+      "slow"
+    ],
+    "id": "fb_1762499912474_3iu3oei",
+    "timestamp": "2025-11-07T07:18:32.474Z",
+    "version": "1.0.0",
+    "resolved": false
+  }
+]

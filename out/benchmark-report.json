@@ -1,0 +1,64 @@
+{
+  "timestamp": "2025-11-07T07:15:20.072Z",
+  "summary": {
+    "totalTests": 5,
+    "overallSavings": 93.35083114610674,
+    "totalTokensSaved": 14938
+  },
+  "results": [
+    {
+      "testName": "Simple Incident Creation",
+      "directTokens": 372,
+      "codeModeTokens": 199,
+      "directTime": 0,
+      "codeModeTime": 0,
+      "tokenSavings": 46.50537634408602,
+      "timeOverhead": null
+    },
+    {
+      "testName": "Large Search Results (50 items)",
+      "directTokens": 3869,
+      "codeModeTokens": 232,
+      "directTime": 0,
+      "codeModeTime": 0,
+      "tokenSavings": 94.00361850607392,
+      "timeOverhead": null,
+      "sampleSize": 5,
+      "chunking": true
+    },
+    {
+      "testName": "Knowledge Base Export (100 items)",
+      "directTokens": 10852,
+      "codeModeTokens": 211,
+      "directTime": 1,
+      "codeModeTime": 0,
+      "tokenSavings": 98.05565794323627,
+      "timeOverhead": -100,
+      "sampleSize": 5,
+      "chunking": true,
+      "redaction": true
+    },
+    {
+      "testName": "Multi-step Workflow",
+      "directTokens": 443,
+      "codeModeTokens": 219,
+      "directTime": 0,
+      "codeModeTime": 0,
+      "tokenSavings": 50.56433408577878,
+      "timeOverhead": null,
+      "chunking": false,
+      "redaction": true
+    },
+    {
+      "testName": "Log Analysis with Sensitive Data",
+      "directTokens": 466,
+      "codeModeTokens": 203,
+      "directTime": 0,
+      "codeModeTime": 0,
+      "tokenSavings": 56.437768240343345,
+      "timeOverhead": null,
+      "sampleSize": 3,
+      "redaction": true
+    }
+  ]
+}
