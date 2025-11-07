@@ -1,0 +1,8 @@
+Test Case,Operation,Direct MCP Prompt Tokens,Direct MCP Completion Tokens,Direct MCP Total Tokens,Direct MCP Cost ($),Code Mode Prompt Tokens,Code Mode Completion Tokens,Code Mode Total Tokens,Code Mode Cost ($),Token Savings,Percentage Reduction,Cost Savings ($),Features Enabled,Processing Time Direct (ms),Processing Time Code Mode (ms),Time Overhead (%),Memory Usage Direct (MB),Memory Usage Code Mode (MB),Memory Reduction (%)
+Simple Incident Creation,create_incident,287,85,372,0.01116,121,78,199,0.00597,173,46.5,0.00519,Structured logging,50,50,0,100,100,0
+Large Search Results (50 items),search_incidents,3124,745,3869,0.13641,156,76,232,0.00816,3637,94.0,0.12825,Chunking,Sampling,200,210,5,200,150,25
+Knowledge Base Export (100 items),export_knowledge,8912,1940,10852,0.39156,168,43,211,0.00759,10641,98.1,0.38397,Redaction,Chunking,Sampling,200,210,5,500,150,70
+Multi-step Workflow,create_incident->add_solution,321,122,443,0.01629,159,60,219,0.00807,224,50.6,0.00822,Redaction,150,160,6.7,300,150,50
+Log Analysis with Sensitive Data,triage_from_logs,356,110,466,0.01698,143,60,203,0.00759,263,56.4,0.00939,Redaction,Sampling,180,185,2.8,400,150,62.5
+Daily Operations (10 incidents),Mixed,2500,750,3250,0.1125,1650,450,2100,0.0735,1150,35.4,0.039,All features,900,900,0,1000,500,50
+Enterprise (50 incidents),Mixed,12500,3750,16250,0.5625,8250,2250,10500,0.3675,5750,35.4,0.195,All features,4500,4500,0,5000,2500,50
