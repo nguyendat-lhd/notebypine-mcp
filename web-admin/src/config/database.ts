@@ -17,7 +17,7 @@ export class DatabaseService {
 
   async authenticate(): Promise<void> {
     try {
-      await this.client.collection('users').authWithPassword(
+      await this.client.admins.authWithPassword(
         this.config.adminEmail,
         this.config.adminPassword
       );
@@ -38,7 +38,7 @@ export class DatabaseService {
     }
   }
 
-  getClient(): Client {
+  getClient(): PocketBase {
     return this.client;
   }
 

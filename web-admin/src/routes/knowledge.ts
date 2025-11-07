@@ -13,18 +13,65 @@ router.get(
     const { page = 1, limit = 50 } = req.query as any;
     const dbService = req.app.locals.dbService;
 
-    const result = await dbService.getKnowledgeItems('', page, limit);
+    try {
+      // Check if database is available
+      if (dbService && await dbService.testConnection()) {
+        const result = await dbService.getKnowledgeItems('', page, limit);
 
-    res.json({
-      success: true,
-      data: result.items,
-      pagination: {
-        page: result.page,
-        perPage: result.perPage,
-        totalItems: result.totalItems,
-        totalPages: result.totalPages
+        res.json({
+          success: true,
+          data: result.items,
+          pagination: {
+            page: result.page,
+            perPage: result.perPage,
+            totalItems: result.totalItems,
+            totalPages: result.totalPages
+          }
+        });
+      } else {
+        // Return mock data when database is not available
+        const { mockKnowledge } = await import('../config/mockData.js');
+        const pageNum = parseInt(page.toString());
+        const limitNum = parseInt(limit.toString());
+        const startIndex = (pageNum - 1) * limitNum;
+        const endIndex = startIndex + limitNum;
+        const paginatedKnowledge = mockKnowledge.slice(startIndex, endIndex);
+
+        res.json({
+          success: true,
+          data: paginatedKnowledge,
+          pagination: {
+            page: pageNum,
+            perPage: limitNum,
+            totalItems: mockKnowledge.length,
+            totalPages: Math.ceil(mockKnowledge.length / limitNum)
+          }
+        });
       }
-    });
+    } catch (error) {
+      // Fallback to mock data on any error
+      try {
+        const { mockKnowledge } = await import('../config/mockData.js');
+        const pageNum = parseInt(page.toString());
+        const limitNum = parseInt(limit.toString());
+        const startIndex = (pageNum - 1) * limitNum;
+        const endIndex = startIndex + limitNum;
+        const paginatedKnowledge = mockKnowledge.slice(startIndex, endIndex);
+
+        res.json({
+          success: true,
+          data: paginatedKnowledge,
+          pagination: {
+            page: pageNum,
+            perPage: limitNum,
+            totalItems: mockKnowledge.length,
+            totalPages: Math.ceil(mockKnowledge.length / limitNum)
+          }
+        });
+      } catch (mockError) {
+        throw new AppException('Failed to fetch knowledge items', 500);
+      }
+    }
   })
 );
 

@@ -6,2808 +6,1403 @@
     <title>NoteByPine MCP - Incident Management Dashboard</title>
     <style>
         :root {
-  /* Primitive Color Tokens */
-  --color-white: rgba(255, 255, 255, 1);
-  --color-black: rgba(0, 0, 0, 1);
-  --color-cream-50: rgba(252, 252, 249, 1);
-  --color-cream-100: rgba(255, 255, 253, 1);
-  --color-gray-200: rgba(245, 245, 245, 1);
-  --color-gray-300: rgba(167, 169, 169, 1);
-  --color-gray-400: rgba(119, 124, 124, 1);
-  --color-slate-500: rgba(98, 108, 113, 1);
-  --color-brown-600: rgba(94, 82, 64, 1);
-  --color-charcoal-700: rgba(31, 33, 33, 1);
-  --color-charcoal-800: rgba(38, 40, 40, 1);
-  --color-slate-900: rgba(19, 52, 59, 1);
-  --color-teal-300: rgba(50, 184, 198, 1);
-  --color-teal-400: rgba(45, 166, 178, 1);
-  --color-teal-500: rgba(33, 128, 141, 1);
-  --color-teal-600: rgba(29, 116, 128, 1);
-  --color-teal-700: rgba(26, 104, 115, 1);
-  --color-teal-800: rgba(41, 150, 161, 1);
-  --color-red-400: rgba(255, 84, 89, 1);
-  --color-red-500: rgba(192, 21, 47, 1);
-  --color-orange-400: rgba(230, 129, 97, 1);
-  --color-orange-500: rgba(168, 75, 47, 1);
-
-  --color-brown-600-rgb: 94, 82, 64;
-  --color-teal-500-rgb: 33, 128, 141;
-  --color-slate-900-rgb: 19, 52, 59;
-  --color-slate-500-rgb: 98, 108, 113;
-  --color-red-500-rgb: 192, 21, 47;
-  --color-red-400-rgb: 255, 84, 89;
-  --color-orange-500-rgb: 168, 75, 47;
-  --color-orange-400-rgb: 230, 129, 97;
-
-  --color-bg-1: rgba(59, 130, 246, 0.08);
-  --color-bg-2: rgba(245, 158, 11, 0.08);
-  --color-bg-3: rgba(34, 197, 94, 0.08);
-  --color-bg-4: rgba(239, 68, 68, 0.08);
-  --color-bg-5: rgba(147, 51, 234, 0.08);
-  --color-bg-6: rgba(249, 115, 22, 0.08);
-  --color-bg-7: rgba(236, 72, 153, 0.08);
-  --color-bg-8: rgba(6, 182, 212, 0.08);
-
-  --color-background: var(--color-cream-50);
-  --color-surface: var(--color-cream-100);
-  --color-text: var(--color-slate-900);
-  --color-text-secondary: var(--color-slate-500);
-  --color-primary: var(--color-teal-500);
-  --color-primary-hover: var(--color-teal-600);
-  --color-primary-active: var(--color-teal-700);
-  --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
-  --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
-  --color-secondary-active: rgba(var(--color-brown-600-rgb), 0.25);
-  --color-border: rgba(var(--color-brown-600-rgb), 0.2);
-  --color-btn-primary-text: var(--color-cream-50);
-  --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
-  --color-card-border-inner: rgba(var(--color-brown-600-rgb), 0.12);
-  --color-error: var(--color-red-500);
-  --color-success: var(--color-teal-500);
-  --color-warning: var(--color-orange-500);
-  --color-info: var(--color-slate-500);
-  --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
-  --color-select-caret: rgba(var(--color-slate-900-rgb), 0.8);
-
-  --focus-ring: 0 0 0 3px var(--color-focus-ring);
-  --focus-outline: 2px solid var(--color-primary);
-  --status-bg-opacity: 0.15;
-  --status-border-opacity: 0.25;
-
-  --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-family-mono: "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-size-xs: 11px;
-  --font-size-sm: 12px;
-  --font-size-base: 14px;
-  --font-size-md: 14px;
-  --font-size-lg: 16px;
-  --font-size-xl: 18px;
-  --font-size-2xl: 20px;
-  --font-size-3xl: 24px;
-  --font-size-4xl: 30px;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 550;
-  --font-weight-bold: 600;
-  --line-height-tight: 1.2;
-  --line-height-normal: 1.5;
-  --letter-spacing-tight: -0.01em;
-
-  --space-0: 0;
-  --space-1: 1px;
-  --space-2: 2px;
-  --space-4: 4px;
-  --space-6: 6px;
-  --space-8: 8px;
-  --space-10: 10px;
-  --space-12: 12px;
-  --space-16: 16px;
-  --space-20: 20px;
-  --space-24: 24px;
-  --space-32: 32px;
-
-  --radius-sm: 6px;
-  --radius-base: 8px;
-  --radius-md: 10px;
-  --radius-lg: 12px;
-  --radius-full: 9999px;
-
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-  --shadow-inset-sm: inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.03);
-
-  --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-gray-400-rgb: 119, 124, 124;
-    --color-teal-300-rgb: 50, 184, 198;
-    --color-gray-300-rgb: 167, 169, 169;
-    --color-gray-200-rgb: 245, 245, 245;
-
-    --color-bg-1: rgba(29, 78, 216, 0.15);
-    --color-bg-2: rgba(180, 83, 9, 0.15);
-    --color-bg-3: rgba(21, 128, 61, 0.15);
-    --color-bg-4: rgba(185, 28, 28, 0.15);
-    --color-bg-5: rgba(107, 33, 168, 0.15);
-    --color-bg-6: rgba(194, 65, 12, 0.15);
-    --color-bg-7: rgba(190, 24, 93, 0.15);
-    --color-bg-8: rgba(8, 145, 178, 0.15);
-
-    --color-background: var(--color-charcoal-700);
-    --color-surface: var(--color-charcoal-800);
-    --color-text: var(--color-gray-200);
-    --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
-    --color-primary: var(--color-teal-300);
-    --color-primary-hover: var(--color-teal-400);
-    --color-primary-active: var(--color-teal-800);
-    --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
-    --color-secondary-hover: rgba(var(--color-gray-400-rgb), 0.25);
-    --color-secondary-active: rgba(var(--color-gray-400-rgb), 0.3);
-    --color-border: rgba(var(--color-gray-400-rgb), 0.3);
-    --color-error: var(--color-red-400);
-    --color-success: var(--color-teal-300);
-    --color-warning: var(--color-orange-400);
-    --color-info: var(--color-gray-300);
-    --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
-    --color-btn-primary-text: var(--color-slate-900);
-    --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
-    --color-card-border-inner: rgba(var(--color-gray-400-rgb), 0.15);
-    --shadow-inset-sm: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.15);
-    --color-select-caret: rgba(var(--color-gray-200-rgb), 0.8);
-  }
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  height: 100%;
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  color: var(--color-text);
-  background-color: var(--color-background);
-  -webkit-font-smoothing: antialiased;
-}
-
-.app-container {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* Sidebar */
-.sidebar {
-  width: 260px;
-  background-color: var(--color-surface);
-  border-right: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  transition: transform var(--duration-normal) var(--ease-standard);
-}
-
-.sidebar-header {
-  padding: var(--space-20) var(--space-16);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-}
-
-.logo-icon {
-  width: 32px;
-  height: 32px;
-  background: var(--color-primary);
-  border-radius: var(--radius-base);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-btn-primary-text);
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-lg);
-}
-
-.logo-text {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-}
-
-.nav-menu {
-  flex: 1;
-  padding: var(--space-16);
-  overflow-y: auto;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-  padding: var(--space-10) var(--space-12);
-  margin-bottom: var(--space-4);
-  border-radius: var(--radius-base);
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-standard);
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-medium);
-}
-
-.nav-item:hover {
-  background-color: var(--color-secondary);
-  color: var(--color-text);
-}
-
-.nav-item.active {
-  background-color: var(--color-primary);
-  color: var(--color-btn-primary-text);
-}
-
-.nav-icon {
-  width: 20px;
-  height: 20px;
-}
-
-/* Main Content */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.top-bar {
-  background-color: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--space-16) var(--space-24);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.top-bar-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-16);
-}
-
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text);
-  padding: var(--space-8);
-}
-
-.page-title {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-}
-
-.top-bar-right {
-  display: flex;
-  align-items: center;
-  gap: var(--space-16);
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-  cursor: pointer;
-  padding: var(--space-6) var(--space-12);
-  border-radius: var(--radius-base);
-  transition: background-color var(--duration-fast) var(--ease-standard);
-}
-
-.user-profile:hover {
-  background-color: var(--color-secondary);
-}
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  background: var(--color-primary);
-  color: var(--color-btn-primary-text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: var(--font-weight-semibold);
-}
-
-.content-area {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-24);
-}
-
-/* Cards */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-16);
-  margin-bottom: var(--space-24);
-}
-
-.stat-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-20);
-  transition: all var(--duration-normal) var(--ease-standard);
-}
-
-.stat-card:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.stat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--space-12);
-}
-
-.stat-label {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-medium);
-}
-
-.stat-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-base);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-xl);
-}
-
-.stat-value {
-  font-size: var(--font-size-4xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text);
-  margin-bottom: var(--space-4);
-}
-
-.stat-change {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-}
-
-/* Table */
-.table-container {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.table-header {
-  padding: var(--space-20);
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-16);
-}
-
-.table-title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-}
-
-.table-actions {
-  display: flex;
-  gap: var(--space-8);
-  flex-wrap: wrap;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-base);
-  padding: var(--space-8) var(--space-12);
-  min-width: 250px;
-}
-
-.search-box input {
-  border: none;
-  background: none;
-  outline: none;
-  flex: 1;
-  color: var(--color-text);
-  font-size: var(--font-size-sm);
-}
-
-.filter-group {
-  display: flex;
-  gap: var(--space-8);
-  align-items: center;
-}
-
-.filter-select {
-  padding: var(--space-8) var(--space-12);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-base);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  transition: border-color var(--duration-fast) var(--ease-standard);
-}
-
-.filter-select:focus {
-  border-color: var(--color-primary);
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table thead {
-  background-color: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.table th {
-  text-align: left;
-  padding: var(--space-12) var(--space-16);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.table td {
-  padding: var(--space-16);
-  border-bottom: 1px solid var(--color-card-border-inner);
-  color: var(--color-text);
-  font-size: var(--font-size-sm);
-}
-
-.table tbody tr {
-  transition: background-color var(--duration-fast) var(--ease-standard);
-  cursor: pointer;
-}
-
-.table tbody tr:hover {
-  background-color: var(--color-secondary);
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--space-4) var(--space-10);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  border: 1px solid;
-}
-
-.badge-critical {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-.badge-high {
-  background-color: rgba(249, 115, 22, 0.1);
-  color: #ea580c;
-  border-color: rgba(249, 115, 22, 0.3);
-}
-
-.badge-medium {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: #d97706;
-  border-color: rgba(245, 158, 11, 0.3);
-}
-
-.badge-low {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #2563eb;
-  border-color: rgba(59, 130, 246, 0.3);
-}
-
-.badge-open {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-.badge-in-progress {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: #d97706;
-  border-color: rgba(245, 158, 11, 0.3);
-}
-
-.badge-resolved {
-  background-color: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-  border-color: rgba(34, 197, 94, 0.3);
-}
-
-.badge-closed {
-  background-color: rgba(107, 114, 128, 0.1);
-  color: #6b7280;
-  border-color: rgba(107, 114, 128, 0.3);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-10) var(--space-16);
-  border-radius: var(--radius-base);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  transition: all var(--duration-normal) var(--ease-standard);
-  border: none;
-  gap: var(--space-8);
-}
-
-.btn-primary {
-  background-color: var(--color-primary);
-  color: var(--color-btn-primary-text);
-}
-
-.btn-primary:hover {
-  background-color: var(--color-primary-hover);
-}
-
-.btn-secondary {
-  background-color: var(--color-secondary);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-}
-
-.btn-secondary:hover {
-  background-color: var(--color-secondary-hover);
-}
-
-.btn-sm {
-  padding: var(--space-6) var(--space-12);
-  font-size: var(--font-size-xs);
-}
-
-/* Detail View */
-.detail-container {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--space-24);
-  gap: var(--space-16);
-  flex-wrap: wrap;
-}
-
-.detail-title-section {
-  flex: 1;
-}
-
-.detail-title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin-bottom: var(--space-8);
-}
-
-.detail-meta {
-  display: flex;
-  gap: var(--space-16);
-  flex-wrap: wrap;
-  margin-top: var(--space-12);
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.detail-actions {
-  display: flex;
-  gap: var(--space-8);
-  flex-wrap: wrap;
-}
-
-.detail-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-24);
-  margin-bottom: var(--space-16);
-}
-
-.detail-card-title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin-bottom: var(--space-16);
-}
-
-.detail-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-16);
-}
-
-.detail-field {
-  margin-bottom: var(--space-16);
-}
-
-.field-label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-  margin-bottom: var(--space-6);
-}
-
-.field-value {
-  color: var(--color-text);
-  font-size: var(--font-size-base);
-}
-
-.solution-item {
-  padding: var(--space-16);
-  background-color: var(--color-background);
-  border-radius: var(--radius-base);
-  margin-bottom: var(--space-12);
-}
-
-.solution-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--space-12);
-}
-
-.solution-title {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  font-size: var(--font-size-base);
-}
-
-.solution-time {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.solution-description {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: 1.6;
-}
-
-/* Timeline */
-.timeline {
-  position: relative;
-  padding-left: var(--space-24);
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 4px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background-color: var(--color-border);
-}
-
-.timeline-item {
-  position: relative;
-  margin-bottom: var(--space-20);
-}
-
-.timeline-marker {
-  position: absolute;
-  left: -20px;
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-primary);
-  border: 2px solid var(--color-surface);
-}
-
-.timeline-content {
-  background-color: var(--color-background);
-  padding: var(--space-12);
-  border-radius: var(--radius-base);
-}
-
-.timeline-title {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin-bottom: var(--space-4);
-  font-size: var(--font-size-sm);
-}
-
-.timeline-time {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-}
-
-/* Export Page */
-.export-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--space-16);
-  margin-bottom: var(--space-24);
-}
-
-.export-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-24);
-  text-align: center;
-  cursor: pointer;
-  transition: all var(--duration-normal) var(--ease-standard);
-}
-
-.export-card:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
-}
-
-.export-icon {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto var(--space-16);
-  background-color: var(--color-bg-1);
-  border-radius: var(--radius-base);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-2xl);
-}
-
-.export-title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin-bottom: var(--space-8);
-}
-
-.export-description {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-/* Lessons Learned */
-.lesson-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-20);
-  margin-bottom: var(--space-16);
-}
-
-.lesson-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--space-12);
-}
-
-.lesson-incident {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  font-size: var(--font-size-base);
-}
-
-.lesson-type {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  background-color: var(--color-bg-2);
-  padding: var(--space-4) var(--space-8);
-  border-radius: var(--radius-sm);
-}
-
-.lesson-content {
-  margin-bottom: var(--space-12);
-}
-
-.lesson-label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  margin-bottom: var(--space-4);
-}
-
-.lesson-text {
-  color: var(--color-text);
-  font-size: var(--font-size-sm);
-  line-height: 1.6;
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: var(--space-32);
-  color: var(--color-text-secondary);
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: var(--space-16);
-  opacity: 0.5;
-}
-
-.empty-title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin-bottom: var(--space-8);
-}
-
-.empty-description {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  margin-bottom: var(--space-16);
-}
-
-/* Pagination */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--space-8);
-  padding: var(--space-20);
-  border-top: 1px solid var(--color-border);
-}
-
-.pagination-btn {
-  padding: var(--space-6) var(--space-12);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  border-radius: var(--radius-base);
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-standard);
-  font-size: var(--font-size-sm);
-}
-
-.pagination-btn:hover:not(:disabled) {
-  background-color: var(--color-secondary);
-}
-
-.pagination-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pagination-btn.active {
-  background-color: var(--color-primary);
-  color: var(--color-btn-primary-text);
-  border-color: var(--color-primary);
-}
-
-/* Loading State */
-.loading {
-  text-align: center;
-  padding: var(--space-32);
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--color-border);
-  border-top-color: var(--color-primary);
-  border-radius: var(--radius-full);
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto var(--space-16);
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Toast Notification */
-.toast {
-  position: fixed;
-  bottom: var(--space-24);
-  right: var(--space-24);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-16);
-  box-shadow: var(--shadow-lg);
-  min-width: 300px;
-  z-index: 1000;
-  animation: slideIn 0.3s var(--ease-standard);
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(400px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.toast-content {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-12);
-}
-
-.toast-icon {
-  font-size: var(--font-size-xl);
-}
-
-.toast-message {
-  flex: 1;
-}
-
-.toast-title {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin-bottom: var(--space-4);
-  font-size: var(--font-size-sm);
-}
-
-.toast-text {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-}
-
-.toast-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xl);
-  line-height: 1;
-  padding: 0;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    z-index: 100;
-    transform: translateX(-100%);
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .menu-toggle {
-    display: block;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .table-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .table-actions {
-    flex-direction: column;
-  }
-
-  .search-box {
-    width: 100%;
-  }
-
-  .table {
-    font-size: var(--font-size-xs);
-  }
-
-  .table th,
-  .table td {
-    padding: var(--space-8);
-  }
-
-  .detail-header {
-    flex-direction: column;
-  }
-
-  .export-options {
-    grid-template-columns: 1fr;
-  }
-
-  .toast {
-    left: var(--space-16);
-    right: var(--space-16);
-    min-width: auto;
-  }
-}
-
-.hidden {
-  display: none;
-}
-
-/* AI Chat Assistant Styles */
-.chat-float-button {
-  position: fixed;
-  bottom: var(--space-24);
-  right: var(--space-24);
-  width: 60px;
-  height: 60px;
-  background: var(--color-primary);
-  color: var(--color-btn-primary-text);
-  border-radius: var(--radius-full);
-  border: none;
-  cursor: pointer;
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-2xl);
-  transition: all var(--duration-normal) var(--ease-standard);
-  z-index: 999;
-  animation: bounceIn 0.6s var(--ease-standard);
-}
-
-.chat-float-button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-}
-
-.chat-float-button:active {
-  transform: scale(0.95);
-}
-
-@keyframes bounceIn {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.chat-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: var(--color-error);
-  color: white;
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: var(--radius-full);
-  font-weight: var(--font-weight-bold);
-}
-
-.chat-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 400px;
-  background: var(--color-surface);
-  border-left: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  z-index: 1000;
-  transform: translateX(100%);
-  transition: transform var(--duration-normal) var(--ease-standard);
-  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
-}
-
-.chat-panel.open {
-  transform: translateX(0);
-}
-
-.chat-header {
-  padding: var(--space-20) var(--space-16);
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--color-background);
-}
-
-.chat-header-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-}
-
-.chat-avatar {
-  width: 36px;
-  height: 36px;
-  background: var(--color-primary);
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-lg);
-}
-
-.chat-title-text h3 {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  margin-bottom: 2px;
-}
-
-.chat-status {
-  font-size: var(--font-size-xs);
-  color: var(--color-success);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.status-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--color-success);
-  border-radius: var(--radius-full);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.chat-close {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  font-size: 24px;
-  line-height: 1;
-  padding: var(--space-4);
-  border-radius: var(--radius-base);
-  transition: all var(--duration-fast) var(--ease-standard);
-}
-
-.chat-close:hover {
-  background: var(--color-secondary);
-  color: var(--color-text);
-}
-
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-16);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-16);
-}
-
-.chat-message {
-  display: flex;
-  gap: var(--space-12);
-  animation: fadeInUp 0.3s var(--ease-standard);
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.chat-message.user {
-  flex-direction: row-reverse;
-}
-
-.message-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-}
-
-.message-avatar.ai {
-  background: var(--color-primary);
-  color: var(--color-btn-primary-text);
-}
-
-.message-avatar.user {
-  background: var(--color-secondary);
-  color: var(--color-text);
-}
-
-.message-content {
-  max-width: 75%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-}
-
-.message-bubble {
-  padding: var(--space-12) var(--space-16);
-  border-radius: var(--radius-lg);
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-.chat-message.ai .message-bubble {
-  background: var(--color-background);
-  color: var(--color-text);
-  border: 1px solid var(--color-card-border);
-}
-
-.chat-message.user .message-bubble {
-  background: var(--color-primary);
-  color: var(--color-btn-primary-text);
-}
-
-.message-time {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  padding: 0 var(--space-4);
-}
-
-.incident-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-base);
-  padding: var(--space-12);
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-standard);
-}
-
-.incident-card:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
-}
-
-.incident-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: var(--space-8);
-}
-
-.incident-card-title {
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-  color: var(--color-text);
-}
-
-.incident-card-meta {
-  display: flex;
-  gap: var(--space-8);
-  margin-top: var(--space-4);
-}
-
-.typing-indicator {
-  display: flex;
-  gap: 4px;
-  padding: var(--space-12) var(--space-16);
-  background: var(--color-background);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  width: fit-content;
-}
-
-.typing-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--color-text-secondary);
-  border-radius: var(--radius-full);
-  animation: typing 1.4s infinite;
-}
-
-.typing-dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes typing {
-  0%, 60%, 100% {
-    transform: translateY(0);
-    opacity: 0.7;
-  }
-  30% {
-    transform: translateY(-10px);
-    opacity: 1;
-  }
-}
-
-.quick-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-8);
-}
-
-.quick-action-btn {
-  padding: var(--space-8) var(--space-12);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
-  color: var(--color-text);
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-standard);
-  white-space: nowrap;
-}
-
-.quick-action-btn:hover {
-  background: var(--color-primary);
-  color: var(--color-btn-primary-text);
-  border-color: var(--color-primary);
-}
-
-.chat-input-container {
-  padding: var(--space-16);
-  border-top: 1px solid var(--color-border);
-  background: var(--color-background);
-}
-
-.chat-input-wrapper {
-  display: flex;
-  gap: var(--space-8);
-  align-items: flex-end;
-}
-
-.chat-input {
-  flex: 1;
-  padding: var(--space-12) var(--space-16);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-size: 15px;
-  font-family: var(--font-family-base);
-  resize: none;
-  max-height: 120px;
-  min-height: 44px;
-  line-height: 1.5;
-}
-
-.chat-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: var(--focus-ring);
-}
-
-.chat-send-btn {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  background: var(--color-primary);
-  color: var(--color-btn-primary-text);
-  border: none;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-xl);
-  transition: all var(--duration-fast) var(--ease-standard);
-}
-
-.chat-send-btn:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-  transform: scale(1.05);
-}
-
-.chat-send-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.chat-welcome {
-  text-align: center;
-  padding: var(--space-32) var(--space-16);
-}
-
-.chat-welcome-icon {
-  font-size: 48px;
-  margin-bottom: var(--space-16);
-}
-
-.chat-welcome-title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin-bottom: var(--space-8);
-}
-
-.chat-welcome-text {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  margin-bottom: var(--space-24);
-  line-height: 1.6;
-}
-
-.chat-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-}
-
-.chat-overlay.visible {
-  display: block;
-}
-
-/* Mobile Bottom Navigation */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  padding: var(--space-8) var(--space-8) calc(var(--space-8) + env(safe-area-inset-bottom));
-  z-index: 98;
-}
-
-.mobile-nav-items {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.mobile-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-8);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: color var(--duration-fast) var(--ease-standard);
-  min-width: 64px;
-}
-
-.mobile-nav-item.active {
-  color: var(--color-primary);
-}
-
-.mobile-nav-icon {
-  font-size: var(--font-size-2xl);
-}
-
-.mobile-nav-label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .chat-panel {
-    width: 100%;
-    border-left: none;
-  }
-
-  .chat-float-button {
-    display: none;
-  }
-
-  .mobile-nav {
-    display: block;
-  }
-
-  .content-area {
-    padding-bottom: 80px;
-  }
-
-  .message-content {
-    max-width: 85%;
-  }
-
-  .chat-input-wrapper {
-    gap: var(--space-8);
-  }
-
-  .chat-welcome {
-    padding: var(--space-24) var(--space-16);
-  }
-}
-
-@media (min-width: 769px) {
-  .chat-overlay.visible {
-    display: none;
-  }
-}
+            /* Enhanced Color Scheme */
+            --color-white: #ffffff;
+            --color-gray-25: #fcfcfd;
+            --color-gray-50: #f8fafc;
+            --color-gray-100: #f1f5f9;
+            --color-gray-200: #e2e8f0;
+            --color-gray-300: #cbd5e1;
+            --color-gray-400: #94a3b8;
+            --color-gray-500: #64748b;
+            --color-gray-600: #475569;
+            --color-gray-700: #334155;
+            --color-gray-800: #1e293b;
+            --color-gray-900: #0f172a;
+
+            /* Brand Colors */
+            --color-blue-50: #eff6ff;
+            --color-blue-100: #dbeafe;
+            --color-blue-500: #3b82f6;
+            --color-blue-600: #2563eb;
+            --color-blue-700: #1d4ed8;
+            --color-indigo-50: #eef2ff;
+            --color-indigo-500: #6366f1;
+            --color-indigo-600: #4f46e5;
+            --color-purple-50: #f5f3ff;
+            --color-purple-500: #8b5cf6;
+            --color-purple-600: #7c3aed;
+
+            /* Semantic Colors */
+            --color-green-50: #f0fdf4;
+            --color-green-500: #10b981;
+            --color-green-600: #059669;
+            --color-emerald-500: #10b981;
+            --color-emerald-600: #059669;
+            --color-red-50: #fef2f2;
+            --color-red-500: #ef4444;
+            --color-red-600: #dc2626;
+            --color-rose-500: #f43f5e;
+            --color-rose-600: #e11d48;
+            --color-yellow-50: #fffbeb;
+            --color-yellow-500: #f59e0b;
+            --color-yellow-600: #d97706;
+            --color-orange-500: #f97316;
+            --color-orange-600: #ea580c;
+            --color-amber-500: #f59e0b;
+            --color-amber-600: #d97706;
+
+            /* Status Colors */
+            --color-critical: var(--color-rose-600);
+            --color-high: var(--color-orange-600);
+            --color-medium: var(--color-yellow-600);
+            --color-low: var(--color-green-600);
+
+            /* Background Colors */
+            --bg-primary: var(--color-white);
+            --bg-secondary: var(--color-gray-25);
+            --bg-tertiary: var(--color-gray-50);
+            --bg-accent: var(--color-indigo-50);
+
+            /* Text Colors */
+            --text-primary: var(--color-gray-900);
+            --text-secondary: var(--color-gray-600);
+            --text-tertiary: var(--color-gray-500);
+            --text-muted: var(--color-gray-400);
+
+            /* Border Colors */
+            --border-primary: var(--color-gray-200);
+            --border-secondary: var(--color-gray-300);
+            --border-accent: var(--color-indigo-200);
+
+            /* Enhanced Shadows */
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, var(--color-indigo-600), var(--color-blue-600));
+            --gradient-secondary: linear-gradient(135deg, var(--color-purple-600), var(--color-indigo-600));
+            --gradient-success: linear-gradient(135deg, var(--color-emerald-600), var(--color-green-500));
+            --gradient-danger: linear-gradient(135deg, var(--color-rose-600), var(--color-red-500));
+            --gradient-warning: linear-gradient(135deg, var(--color-amber-600), var(--color-orange-500));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Enhanced Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+
+        h1 { font-size: 2.25rem; }
+        h2 { font-size: 1.875rem; }
+        h3 { font-size: 1.5rem; }
+        h4 { font-size: 1.25rem; }
+        h5 { font-size: 1.125rem; }
+        h6 { font-size: 1rem; }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-gray-400);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-gray-500);
+        }
+
+        /* Enhanced Login Container */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: var(--gradient-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .login-card {
+            background: var(--bg-primary);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-2xl);
+            width: 100%;
+            max-width: 440px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: var(--text-primary);
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-primary);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-blue-500);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--color-blue-500);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-blue-600);
+        }
+
+        .btn-primary:disabled {
+            background: var(--color-gray-400);
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--color-red-600);
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Main App */
+        .main-app {
+            display: none;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Enhanced Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                transparent,
+                var(--border-primary) 20%,
+                var(--border-primary) 80%,
+                transparent
+            );
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid var(--border-primary);
+            position: relative;
+            background: var(--gradient-primary);
+        }
+
+        .sidebar-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(to right,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .app-subtitle {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+  
+        .nav-menu {
+            flex: 1;
+            padding: 1.5rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            margin: 0.25rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: calc(100% - 2rem);
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 0;
+            background: var(--gradient-primary);
+            border-radius: 2px;
+            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item:hover {
+            background: var(--bg-accent);
+            color: var(--color-indigo-600);
+            transform: translateX(4px);
+        }
+
+        .nav-item:hover::before {
+            height: 20px;
+        }
+
+        .nav-item.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active::before {
+            height: 24px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-icon {
+            margin-right: 0.875rem;
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            font-size: 16px;
+            filter: grayscale(0);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover .nav-icon,
+        .nav-item.active .nav-icon {
+            transform: scale(1.1);
+        }
+
+        .user-section {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--color-blue-500);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            margin-right: 0.75rem;
+        }
+
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid var(--border-primary);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            width: 300px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--text-tertiary);
+        }
+
+        /* Page Content */
+        .page-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Dashboard */
+        /* Enhanced Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Premium Stat Cards */
+        .stat-card {
+            background: var(--bg-primary);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-primary);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transition: height 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .stat-card:hover::before {
+            height: 6px;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.75rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-change {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            margin-top: 0.5rem;
+        }
+
+        .stat-change.positive {
+            color: var(--color-emerald-600);
+            background: var(--color-emerald-50);
+        }
+
+        .stat-change.negative {
+            color: var(--color-rose-600);
+            background: var(--color-rose-50);
+        }
+
+        /* Stat card icons */
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Enhanced Cards */
+        .card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-primary);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            padding: 2rem 2rem 1rem 2rem;
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-tertiary);
+            position: relative;
+        }
+
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 2rem;
+            right: 2rem;
+            height: 1px;
+            background: linear-gradient(to right,
+                transparent,
+                var(--border-primary),
+                transparent
+            );
+        }
+
+        .card-title {
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        /* Enhanced Content Cards */
+        .incident-card, .solution-card, .knowledge-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .incident-card::before, .solution-card::before, .knowledge-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-primary);
+            transform: scaleY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .incident-card:hover, .solution-card:hover, .knowledge-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateX(4px);
+        }
+
+        .incident-card:hover::before, .solution-card:hover::before, .knowledge-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .incident-header, .solution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .incident-title, .solution-title, .knowledge-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .incident-description, .solution-description, .knowledge-content {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .incident-meta, .solution-meta, .knowledge-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .incident-actions, .solution-actions, .knowledge-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .severity-critical {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--color-critical);
+        }
+
+        .severity-high {
+            background: rgba(234, 88, 12, 0.1);
+            color: var(--color-high);
+        }
+
+        .severity-medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--color-medium);
+        }
+
+        .severity-low {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--color-low);
+        }
+
+        .status-new {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--color-gray-600);
+        }
+
+        .status-investigating {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--color-blue-600);
+        }
+
+        .status-resolved {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--color-green-600);
+        }
+
+        .category-badge {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--color-purple-500);
+        }
+
+        /* Buttons */
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn-danger {
+            background: var(--color-red-500);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: var(--color-red-600);
+        }
+
+        /* Chat */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-primary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-message {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user {
+            background: var(--color-blue-500);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.assistant {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-primary);
+        }
+
+        .message-intent {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 1px solid var(--border-primary);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-primary);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .chat-help {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .command-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .command-list li {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: var(--bg-primary);
+            border-radius: 4px;
+        }
+
+        .command-list code {
+            background: var(--bg-tertiary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            color: white;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification-success {
+            background: var(--color-green-500);
+        }
+
+        .notification-error {
+            background: var(--color-red-500);
+        }
+
+        .notification-info {
+            background: var(--color-blue-500);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Status indicators */
+        .status-healthy {
+            color: var(--color-green-600);
+        }
+
+        .status-unhealthy {
+            color: var(--color-red-600);
+        }
+
+        /* Loading states */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: var(--text-tertiary);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-tertiary);
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-primary);
+        }
+
+        /* Form layouts */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-full {
+            grid-column: 1 / -1;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Search results */
+        .search-section {
+            margin-bottom: 2rem;
+        }
+
+        .search-section h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .search-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .search-item:hover {
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: var(--shadow-2xl);
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .stat-card {
+                padding: 1.5rem;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            .card {
+                border-radius: 12px;
+                margin-bottom: 1.5rem;
+            }
+
+            .card-header {
+                padding: 1.5rem;
+            }
+
+            .card-content {
+                padding: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .search-input {
+                width: 200px;
+            }
+
+            .page-content {
+                padding: 1rem;
+            }
+
+            .top-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                margin: 1rem;
+                padding: 2rem 1.5rem;
+            }
+
+            .app-title {
+                font-size: 1.25rem;
+            }
+
+            .page-title {
+                font-size: 1.25rem;
+            }
+
+            .stat-value {
+                font-size: 1.75rem;
+            }
+
+            .dashboard-grid {
+                gap: 1rem;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .search-bar {
+                width: 100%;
+            }
+
+            .user-section {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .nav-item {
+                padding: 1rem;
+                margin: 0.125rem 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <div class="logo-icon">N</div>
-                    <div class="logo-text">NoteByPine MCP</div>
-                </div>
+    <!-- Login Container -->
+    <div id="login-container" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>NoteByPine MCP</h1>
+                <p>Incident Management Dashboard</p>
             </div>
-            <nav class="nav-menu">
-                <div class="nav-item active" data-page="dashboard">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                    </svg>
-                    <span>Dashboard</span>
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="admin@example.com" required>
                 </div>
-                <div class="nav-item" data-page="incidents">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                    <span>Incidents</span>
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
                 </div>
-                <div class="nav-item" data-page="solutions">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span>Solutions</span>
-                </div>
-                <div class="nav-item" data-page="knowledge">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                    </svg>
-                    <span>Knowledge Base</span>
-                </div>
-                <div class="nav-item" data-page="settings">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <span>Settings</span>
-                </div>
-            </nav>
-        </aside>
+                <button type="submit" id="login-btn" class="btn btn-primary">Login</button>
+                <div id="login-error" class="error-message"></div>
+            </form>
+        </div>
+    </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Top Bar -->
-            <div class="top-bar">
-                <div class="top-bar-left">
-                    <button class="menu-toggle" id="menuToggle">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+    <!-- Main Application -->
+    <div id="main-app" class="main-app">
+        <div class="app-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="app-title">NoteByPine MCP</div>
+                    <div class="app-subtitle">Incident Management</div>
                 </div>
-                <div class="top-bar-right">
-                    <div class="user-profile">
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                    <a href="#" class="nav-item" data-page="incidents">
+                        <span class="nav-icon">🚨</span>
+                        Incidents
+                    </a>
+                    <a href="#" class="nav-item" data-page="solutions">
+                        <span class="nav-icon">💡</span>
+                        Solutions
+                    </a>
+                    <a href="#" class="nav-item" data-page="knowledge">
+                        <span class="nav-icon">📚</span>
+                        Knowledge Base
+                    </a>
+                    <a href="#" class="nav-item" data-page="chat">
+                        <span class="nav-icon">💬</span>
+                        ChatOps
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings">
+                        <span class="nav-icon">⚙️</span>
+                        Settings
+                    </a>
+                </nav>
+                <div class="user-section">
+                    <div class="user-info">
                         <div class="user-avatar">A</div>
-                        <span>Admin</span>
+                        <div class="user-name" id="user-name">Admin User</div>
                     </div>
+                    <button id="logout-btn" class="btn btn-secondary btn-sm">Logout</button>
                 </div>
-            </div>
+            </aside>
 
-            <!-- Content Area -->
-            <div class="content-area" id="contentArea">
-                <!-- Content will be dynamically loaded here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- AI Chat Assistant -->
-    <button class="chat-float-button" id="chatFloatBtn" title="Open AI Assistant">
-        🤖
-        <span class="chat-badge">AI</span>
-    </button>
-
-    <div class="chat-overlay" id="chatOverlay"></div>
-
-    <div class="chat-panel" id="chatPanel">
-        <div class="chat-header">
-            <div class="chat-header-title">
-                <div class="chat-avatar">🤖</div>
-                <div class="chat-title-text">
-                    <h3>AI Assistant</h3>
-                    <div class="chat-status">
-                        <span class="status-dot"></span>
-                        Online
-                    </div>
-                </div>
-            </div>
-            <button class="chat-close" id="chatCloseBtn">×</button>
-        </div>
-
-        <div class="chat-messages" id="chatMessages">
-            <!-- Messages will be dynamically added here -->
-        </div>
-
-        <div class="chat-input-container">
-            <div class="chat-input-wrapper">
-                <textarea 
-                    class="chat-input" 
-                    id="chatInput" 
-                    placeholder="Ask me anything about incidents..."
-                    rows="1"
-                ></textarea>
-                <button class="chat-send-btn" id="chatSendBtn">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Bottom Navigation -->
-    <div class="mobile-nav" id="mobileNav">
-        <div class="mobile-nav-items">
-            <div class="mobile-nav-item active" data-page="dashboard">
-                <div class="mobile-nav-icon">🏠</div>
-                <div class="mobile-nav-label">Dashboard</div>
-            </div>
-            <div class="mobile-nav-item" data-page="incidents">
-                <div class="mobile-nav-icon">⚠️</div>
-                <div class="mobile-nav-label">Incidents</div>
-            </div>
-            <div class="mobile-nav-item" id="mobileChat">
-                <div class="mobile-nav-icon">💬</div>
-                <div class="mobile-nav-label">AI Chat</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Application State
-        const appState = {
-            currentPage: 'dashboard',
-            currentIncident: null,
-            filters: {
-                category: 'all',
-                severity: 'all',
-                status: 'all',
-                search: ''
-            },
-            currentPage_pagination: 1,
-            itemsPerPage: 10,
-            chatOpen: false,
-            chatMessages: [],
-            isTyping: false
-        };
-
-        // Sample Data
-        const incidents = [
-            {
-                id: 'INC-001',
-                title: 'Database Connection Timeout',
-                category: 'Database',
-                severity: 'Critical',
-                status: 'open',
-                created: '2025-11-07',
-                description: 'Connection to production database times out during peak hours',
-                symptoms: 'Slow queries, connection refused errors',
-                context: 'Peak traffic hours 2-4 PM',
-                environment: 'Production',
-                frequency: 'Daily',
-                solutions: [
-                    {
-                        title: 'Increase connection pool',
-                        description: 'Increase max connections from 50 to 200',
-                        time_estimate: '2 hours'
-                    }
-                ]
-            },
-            {
-                id: 'INC-002',
-                title: 'Memory Leak in Cache Service',
-                category: 'Performance',
-                severity: 'High',
-                status: 'in-progress',
-                created: '2025-11-06',
-                description: 'Memory usage grows by 5MB per hour',
-                symptoms: 'Increasing memory consumption',
-                context: 'Cache service running 24/7',
-                environment: 'Production',
-                frequency: 'Continuous',
-                solutions: [
-                    {
-                        title: 'Implement cache eviction policy',
-                        description: 'Add TTL-based cache eviction',
-                        time_estimate: '4 hours'
-                    }
-                ]
-            },
-            {
-                id: 'INC-003',
-                title: 'Authentication API Rate Limit Exceeded',
-                category: 'API',
-                severity: 'Medium',
-                status: 'resolved',
-                created: '2025-11-05',
-                description: 'Rate limiter blocking legitimate requests',
-                symptoms: '429 errors on authentication endpoint',
-                context: 'High user login activity',
-                environment: 'Production',
-                frequency: 'Occasional',
-                solutions: []
-            },
-            {
-                id: 'INC-004',
-                title: 'Missing Log Rotation',
-                category: 'System',
-                severity: 'Low',
-                status: 'resolved',
-                created: '2025-11-04',
-                description: 'Log files consuming 90GB of disk space',
-                symptoms: 'Low disk space warnings',
-                context: 'Log files not rotating',
-                environment: 'Production',
-                frequency: 'One-time',
-                solutions: []
-            }
-        ];
-
-        const lessonsLearned = [
-            {
-                incident: 'INC-001',
-                lesson: 'Implement better connection pooling and monitoring',
-                prevention: 'Set up automated alerts for connection timeouts',
-                type: 'Process Improvement'
-            },
-            {
-                incident: 'INC-002',
-                lesson: 'Cache needs proper memory management',
-                prevention: 'Implement health checks for cache service',
-                type: 'Best Practice'
-            }
-        ];
-
-        // Utility Functions
-        function getSeverityClass(severity) {
-            return `badge-${severity.toLowerCase()}`;
-        }
-
-        function getStatusClass(status) {
-            return `badge-${status.toLowerCase()}`;
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-        }
-
-        function showToast(title, message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `
-                <div class="toast-content">
-                    <div class="toast-icon">${type === 'success' ? '✓' : '!'}</div>
-                    <div class="toast-message">
-                        <div class="toast-title">${title}</div>
-                        <div class="toast-text">${message}</div>
-                    </div>
-                    <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
-                </div>
-            `;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // Filter and Search Functions
-        function getFilteredIncidents() {
-            return incidents.filter(incident => {
-                const matchesCategory = appState.filters.category === 'all' || incident.category === appState.filters.category;
-                const matchesSeverity = appState.filters.severity === 'all' || incident.severity === appState.filters.severity;
-                const matchesStatus = appState.filters.status === 'all' || incident.status === appState.filters.status;
-                const matchesSearch = appState.filters.search === '' || 
-                    incident.title.toLowerCase().includes(appState.filters.search.toLowerCase()) ||
-                    incident.id.toLowerCase().includes(appState.filters.search.toLowerCase());
-                return matchesCategory && matchesSeverity && matchesStatus && matchesSearch;
-            });
-        }
-
-        // Page Renderers
-        function renderDashboard() {
-            const openIncidents = incidents.filter(i => i.status === 'open').length;
-            const resolvedIncidents = incidents.filter(i => i.status === 'resolved').length;
-            const criticalCount = incidents.filter(i => i.severity === 'Critical').length;
-            const highCount = incidents.filter(i => i.severity === 'High').length;
-            const mediumCount = incidents.filter(i => i.severity === 'Medium').length;
-            const lowCount = incidents.filter(i => i.severity === 'Low').length;
-
-            return `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div>
-                                <div class="stat-label">Total Incidents</div>
-                                <div class="stat-value">${incidents.length}</div>
-                                <div class="stat-change">All time</div>
-                            </div>
-                            <div class="stat-icon" style="background-color: var(--color-bg-1); color: #3b82f6;">📊</div>
+            <!-- Main Content -->
+            <main class="main-content">
+                <header class="top-header">
+                    <h1 class="page-title" id="page-title">Dashboard</h1>
+                    <div class="header-actions">
+                        <div class="search-bar">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="search-input" class="search-input" placeholder="Search...">
                         </div>
+                        <button id="search-btn" class="btn btn-secondary">Search</button>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div>
-                                <div class="stat-label">Open Incidents</div>
-                                <div class="stat-value">${openIncidents}</div>
-                                <div class="stat-change">Requires attention</div>
-                            </div>
-                            <div class="stat-icon" style="background-color: var(--color-bg-4); color: #ef4444;">🚨</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div>
-                                <div class="stat-label">Resolved</div>
-                                <div class="stat-value">${resolvedIncidents}</div>
-                                <div class="stat-change">Completed</div>
-                            </div>
-                            <div class="stat-icon" style="background-color: var(--color-bg-3); color: #22c55e;">✓</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div>
-                                <div class="stat-label">In Progress</div>
-                                <div class="stat-value">${incidents.filter(i => i.status === 'in-progress').length}</div>
-                                <div class="stat-change">Being worked on</div>
-                            </div>
-                            <div class="stat-icon" style="background-color: var(--color-bg-2); color: #f59e0b;">⏳</div>
-                        </div>
-                    </div>
-                </div>
+                </header>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label" style="margin-bottom: 12px;">Severity Distribution</div>
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="badge badge-critical">Critical</span>
-                                <span style="font-weight: 600;">${criticalCount}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="badge badge-high">High</span>
-                                <span style="font-weight: 600;">${highCount}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="badge badge-medium">Medium</span>
-                                <span style="font-weight: 600;">${mediumCount}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="badge badge-low">Low</span>
-                                <span style="font-weight: 600;">${lowCount}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-header">
-                        <h2 class="table-title">Recent Incidents</h2>
-                        <button class="btn btn-primary" onclick="navigateToPage('incidents')">
-                            View All Incidents →
-                        </button>
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Title</th>
-                                <th>Category</th>
-                                <th>Severity</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${incidents.slice(0, 5).map(incident => `
-                                <tr onclick="viewIncidentDetail('${incident.id}')">
-                                    <td><strong>${incident.id}</strong></td>
-                                    <td>${incident.title}</td>
-                                    <td>${incident.category}</td>
-                                    <td><span class="badge ${getSeverityClass(incident.severity)}">${incident.severity}</span></td>
-                                    <td><span class="badge ${getStatusClass(incident.status)}">${incident.status}</span></td>
-                                    <td>${formatDate(incident.created)}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-
-        function renderIncidents() {
-            const filteredIncidents = getFilteredIncidents();
-            const totalPages = Math.ceil(filteredIncidents.length / appState.itemsPerPage);
-            const startIndex = (appState.currentPage_pagination - 1) * appState.itemsPerPage;
-            const endIndex = startIndex + appState.itemsPerPage;
-            const paginatedIncidents = filteredIncidents.slice(startIndex, endIndex);
-
-            return `
-                <div class="table-container">
-                    <div class="table-header">
-                        <h2 class="table-title">All Incidents</h2>
-                        <div class="table-actions">
-                            <div class="search-box">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                                <input type="text" placeholder="Search incidents..." id="searchInput" value="${appState.filters.search}">
-                            </div>
-                            <div class="filter-group">
-                                <select class="filter-select" id="categoryFilter">
-                                    <option value="all">All Categories</option>
-                                    <option value="Database">Database</option>
-                                    <option value="API">API</option>
-                                    <option value="Performance">Performance</option>
-                                    <option value="Security">Security</option>
-                                    <option value="System">System</option>
-                                    <option value="Frontend">Frontend</option>
-                                </select>
-                                <select class="filter-select" id="severityFilter">
-                                    <option value="all">All Severities</option>
-                                    <option value="Critical">Critical</option>
-                                    <option value="High">High</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Low">Low</option>
-                                </select>
-                                <select class="filter-select" id="statusFilter">
-                                    <option value="all">All Statuses</option>
-                                    <option value="open">Open</option>
-                                    <option value="in-progress">In Progress</option>
-                                    <option value="resolved">Resolved</option>
-                                    <option value="closed">Closed</option>
-                                </select>
-                            </div>
-                            <button class="btn btn-primary" onclick="showToast('Feature Coming Soon', 'Add new incident functionality will be available soon')">
-                                + Add Incident
-                            </button>
-                        </div>
-                    </div>
-                    ${paginatedIncidents.length > 0 ? `
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Title</th>
-                                    <th>Category</th>
-                                    <th>Severity</th>
-                                    <th>Status</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${paginatedIncidents.map(incident => `
-                                    <tr onclick="viewIncidentDetail('${incident.id}')">
-                                        <td><strong>${incident.id}</strong></td>
-                                        <td>${incident.title}</td>
-                                        <td>${incident.category}</td>
-                                        <td><span class="badge ${getSeverityClass(incident.severity)}">${incident.severity}</span></td>
-                                        <td><span class="badge ${getStatusClass(incident.status)}">${incident.status}</span></td>
-                                        <td>${formatDate(incident.created)}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); viewIncidentDetail('${incident.id}')">
-                                                View
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        ${totalPages > 1 ? `
-                            <div class="pagination">
-                                <button class="pagination-btn" onclick="changePage(${appState.currentPage_pagination - 1})" ${appState.currentPage_pagination === 1 ? 'disabled' : ''}>
-                                    Previous
-                                </button>
-                                ${Array.from({length: totalPages}, (_, i) => i + 1).map(page => `
-                                    <button class="pagination-btn ${page === appState.currentPage_pagination ? 'active' : ''}" onclick="changePage(${page})">
-                                        ${page}
-                                    </button>
-                                `).join('')}
-                                <button class="pagination-btn" onclick="changePage(${appState.currentPage_pagination + 1})" ${appState.currentPage_pagination === totalPages ? 'disabled' : ''}>
-                                    Next
-                                </button>
-                            </div>
-                        ` : ''}
-                    ` : `
-                        <div class="empty-state">
-                            <div class="empty-icon">🔍</div>
-                            <div class="empty-title">No incidents found</div>
-                            <div class="empty-description">Try adjusting your filters or search query</div>
-                        </div>
-                    `}
-                </div>
-            `;
-        }
-
-        function renderIncidentDetail() {
-            const incident = incidents.find(i => i.id === appState.currentIncident);
-            if (!incident) return '<div class="empty-state"><div class="empty-title">Incident not found</div></div>';
-
-            return `
-                <div class="detail-container">
-                    <button class="btn btn-secondary" onclick="navigateToPage('incidents')" style="margin-bottom: 24px;">
-                        ← Back to Incidents
-                    </button>
-
-                    <div class="detail-header">
-                        <div class="detail-title-section">
-                            <div class="detail-title">${incident.title}</div>
-                            <div class="detail-meta">
-                                <div class="meta-item">
-                                    <strong>ID:</strong> ${incident.id}
+                <div class="page-content">
+                    <!-- Dashboard Page -->
+                    <div id="dashboard-page" class="page active">
+                        <div class="dashboard-grid">
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Total Incidents</div>
+                                    <div class="stat-icon">🚨</div>
                                 </div>
-                                <div class="meta-item">
-                                    <strong>Created:</strong> ${formatDate(incident.created)}
+                                <div class="stat-value" id="total-incidents">0</div>
+                                <div class="stat-change positive">+0% from last month</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Total Solutions</div>
+                                    <div class="stat-icon">✅</div>
                                 </div>
-                                <div class="meta-item">
-                                    <span class="badge ${getSeverityClass(incident.severity)}">${incident.severity}</span>
+                                <div class="stat-value" id="total-solutions">0</div>
+                                <div class="stat-change positive">Resolved issues</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Knowledge Base</div>
+                                    <div class="stat-icon">📚</div>
                                 </div>
-                                <div class="meta-item">
-                                    <span class="badge ${getStatusClass(incident.status)}">${incident.status}</span>
+                                <div class="stat-value" id="total-knowledge">0</div>
+                                <div class="stat-change">Articles available</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Recent Incidents</div>
+                                    <div class="stat-icon">📅</div>
+                                </div>
+                                <div class="stat-value" id="recent-incidents">0</div>
+                                <div class="stat-change">Last 7 days</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">High Severity</div>
+                                    <div class="stat-icon">🔥</div>
+                                </div>
+                                <div class="stat-value" id="high-severity">0</div>
+                                <div class="stat-change negative">Requires attention</div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">System Status</h2>
+                            </div>
+                            <div class="card-content">
+                                <div id="system-status" class="status-healthy">✅ All systems operational</div>
+                                <div style="margin-top: 1rem; color: var(--text-secondary);">
+                                    Server uptime: <span id="server-uptime">0m 0s</span><br>
+                                    Memory usage: <span id="memory-usage">0MB</span><br>
+                                    Database status: <span id="db-status">Connected</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="detail-actions">
-                            <button class="btn btn-primary" onclick="showToast('Status Updated', 'Incident status has been updated')">
-                                Update Status
-                            </button>
-                            <button class="btn btn-secondary" onclick="showToast('Edit Mode', 'Edit functionality will open incident form')">
-                                Edit
-                            </button>
-                        </div>
                     </div>
 
-                    <div class="detail-card">
-                        <div class="detail-card-title">Incident Details</div>
-                        <div class="detail-grid">
-                            <div class="detail-field">
-                                <div class="field-label">Category</div>
-                                <div class="field-value">${incident.category}</div>
+                    <!-- Incidents Page -->
+                    <div id="incidents-page" class="page">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Create New Incident</h2>
                             </div>
-                            <div class="detail-field">
-                                <div class="field-label">Environment</div>
-                                <div class="field-value">${incident.environment}</div>
-                            </div>
-                            <div class="detail-field">
-                                <div class="field-label">Frequency</div>
-                                <div class="field-value">${incident.frequency}</div>
-                            </div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="field-label">Description</div>
-                            <div class="field-value">${incident.description}</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="field-label">Symptoms</div>
-                            <div class="field-value">${incident.symptoms}</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="field-label">Context</div>
-                            <div class="field-value">${incident.context}</div>
-                        </div>
-                    </div>
-
-                    <div class="detail-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                            <div class="detail-card-title" style="margin-bottom: 0;">Solutions</div>
-                            <button class="btn btn-sm btn-primary" onclick="showToast('Solution Added', 'New solution has been added to this incident')">
-                                + Add Solution
-                            </button>
-                        </div>
-                        ${incident.solutions.length > 0 ? incident.solutions.map(solution => `
-                            <div class="solution-item">
-                                <div class="solution-header">
-                                    <div class="solution-title">${solution.title}</div>
-                                    <div class="solution-time">⏱ ${solution.time_estimate}</div>
-                                </div>
-                                <div class="solution-description">${solution.description}</div>
-                            </div>
-                        `).join('') : `
-                            <div class="empty-state" style="padding: 32px;">
-                                <div class="empty-title" style="font-size: 16px;">No solutions yet</div>
-                                <div class="empty-description">Add a solution to help resolve this incident</div>
-                            </div>
-                        `}
-                    </div>
-
-                    <div class="detail-card">
-                        <div class="detail-card-title">Lessons Learned</div>
-                        ${lessonsLearned.filter(l => l.incident === incident.id).length > 0 ? 
-                            lessonsLearned.filter(l => l.incident === incident.id).map(lesson => `
-                                <div class="detail-field">
-                                    <div class="field-label">Lesson</div>
-                                    <div class="field-value">${lesson.lesson}</div>
-                                </div>
-                                <div class="detail-field">
-                                    <div class="field-label">Prevention</div>
-                                    <div class="field-value">${lesson.prevention}</div>
-                                </div>
-                            `).join('') : `
-                            <div class="empty-state" style="padding: 32px;">
-                                <div class="empty-title" style="font-size: 16px;">No lessons learned documented</div>
-                                <div class="empty-description">Document insights from this incident</div>
-                            </div>
-                        `}
-                    </div>
-
-                    <div class="detail-card">
-                        <div class="detail-card-title">Activity Timeline</div>
-                        <div class="timeline">
-                            <div class="timeline-item">
-                                <div class="timeline-marker"></div>
-                                <div class="timeline-content">
-                                    <div class="timeline-title">Incident Created</div>
-                                    <div class="timeline-time">${formatDate(incident.created)} at 10:30 AM</div>
-                                </div>
-                            </div>
-                            ${incident.status !== 'open' ? `
-                                <div class="timeline-item">
-                                    <div class="timeline-marker"></div>
-                                    <div class="timeline-content">
-                                        <div class="timeline-title">Status changed to ${incident.status}</div>
-                                        <div class="timeline-time">${formatDate(incident.created)} at 2:45 PM</div>
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderSolutions() {
-            const incidentsWithSolutions = incidents.filter(i => i.solutions.length > 0);
-
-            return `
-                <div class="table-container">
-                    <div class="table-header">
-                        <h2 class="table-title">Solutions Management</h2>
-                        <button class="btn btn-primary" onclick="showToast('Add Solution', 'Select an incident to add a solution')">
-                            + Add Solution
-                        </button>
-                    </div>
-                    ${incidentsWithSolutions.length > 0 ? `
-                        <div style="padding: 24px;">
-                            ${incidentsWithSolutions.map(incident => `
-                                <div class="detail-card" style="margin-bottom: 16px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                            <div class="card-content">
+                                <form id="incident-form">
+                                    <div class="form-grid">
                                         <div>
-                                            <div style="font-weight: 600; margin-bottom: 4px;">${incident.title}</div>
-                                            <div style="font-size: 12px; color: var(--color-text-secondary);">${incident.id} • ${incident.category}</div>
+                                            <label class="form-label" for="incident-title">Title *</label>
+                                            <input type="text" id="incident-title" class="form-input" required>
                                         </div>
-                                        <span class="badge ${getSeverityClass(incident.severity)}">${incident.severity}</span>
-                                    </div>
-                                    ${incident.solutions.map(solution => `
-                                        <div class="solution-item">
-                                            <div class="solution-header">
-                                                <div class="solution-title">${solution.title}</div>
-                                                <div class="solution-time">⏱ ${solution.time_estimate}</div>
-                                            </div>
-                                            <div class="solution-description">${solution.description}</div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : `
-                        <div class="empty-state">
-                            <div class="empty-icon">💡</div>
-                            <div class="empty-title">No solutions yet</div>
-                            <div class="empty-description">Solutions will appear here once they are added to incidents</div>
-                        </div>
-                    `}
-                </div>
-            `;
-        }
-
-        function renderKnowledge() {
-            return `
-                <div>
-                    <div class="export-options">
-                        <div class="export-card" onclick="exportData('json')">
-                            <div class="export-icon" style="background-color: var(--color-bg-1);">📄</div>
-                            <div class="export-title">Export JSON</div>
-                            <div class="export-description">Download all incident data in JSON format</div>
-                        </div>
-                        <div class="export-card" onclick="exportData('csv')">
-                            <div class="export-icon" style="background-color: var(--color-bg-3);">📊</div>
-                            <div class="export-title">Export CSV</div>
-                            <div class="export-description">Download incident data as CSV file</div>
-                        </div>
-                        <div class="export-card" onclick="exportData('markdown')">
-                            <div class="export-icon" style="background-color: var(--color-bg-5);">📝</div>
-                            <div class="export-title">Export Markdown</div>
-                            <div class="export-description">Generate markdown documentation</div>
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h2 class="table-title">Lessons Learned</h2>
-                        </div>
-                        <div style="padding: 24px;">
-                            ${lessonsLearned.length > 0 ? lessonsLearned.map(lesson => {
-                                const incident = incidents.find(i => i.id === lesson.incident);
-                                return `
-                                    <div class="lesson-card">
-                                        <div class="lesson-header">
-                                            <div>
-                                                <div class="lesson-incident">${incident ? incident.title : lesson.incident}</div>
-                                                <div style="color: var(--color-text-secondary); font-size: 12px; margin-top: 4px;">${lesson.incident}</div>
-                                            </div>
-                                            <div class="lesson-type">${lesson.type}</div>
-                                        </div>
-                                        <div class="lesson-content">
-                                            <div class="lesson-label">Lesson</div>
-                                            <div class="lesson-text">${lesson.lesson}</div>
-                                        </div>
-                                        <div class="lesson-content">
-                                            <div class="lesson-label">Prevention</div>
-                                            <div class="lesson-text">${lesson.prevention}</div>
+                                        <div>
+                                            <label class="form-label" for="incident-severity">Severity *</label>
+                                            <select id="incident-severity" class="form-input">
+                                                <option value="low">Low</option>
+                                                <option value="medium" selected>Medium</option>
+                                                <option value="high">High</option>
+                                                <option value="critical">Critical</option>
+                                            </select>
                                         </div>
                                     </div>
-                                `;
-                            }).join('') : `
-                                <div class="empty-state">
-                                    <div class="empty-icon">📚</div>
-                                    <div class="empty-title">No lessons learned yet</div>
-                                    <div class="empty-description">Document insights from incidents to build your knowledge base</div>
-                                </div>
-                            `}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderSettings() {
-            return `
-                <div class="detail-container">
-                    <div class="detail-card">
-                        <div class="detail-card-title">System Settings</div>
-                        <div class="detail-field">
-                            <div class="field-label">System Name</div>
-                            <div class="field-value">NoteByPine MCP Incident Management</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="field-label">Version</div>
-                            <div class="field-value">1.0.0</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="field-label">Last Updated</div>
-                            <div class="field-value">November 7, 2025</div>
-                        </div>
-                    </div>
-
-                    <div class="detail-card">
-                        <div class="detail-card-title">User Preferences</div>
-                        <div class="detail-field">
-                            <div class="field-label">Theme</div>
-                            <select class="filter-select" style="width: 100%; max-width: 300px;">
-                                <option>Auto (System)</option>
-                                <option>Light</option>
-                                <option>Dark</option>
-                            </select>
-                        </div>
-                        <div class="detail-field">
-                            <div class="field-label">Notifications</div>
-                            <select class="filter-select" style="width: 100%; max-width: 300px;">
-                                <option>All Incidents</option>
-                                <option>Critical Only</option>
-                                <option>Disabled</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="detail-card">
-                        <div class="detail-card-title">About</div>
-                        <p style="color: var(--color-text-secondary); line-height: 1.6;">
-                            NoteByPine MCP Incident Management System helps teams track, manage, and learn from incidents.
-                            Built with modern web technologies and designed for ease of use.
-                        </p>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Navigation Functions
-        function navigateToPage(page) {
-            appState.currentPage = page;
-            appState.currentPage_pagination = 1;
-            
-            // Update active nav item
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.dataset.page === page) {
-                    item.classList.add('active');
-                }
-            });
-
-            // Update page title
-            const titles = {
-                dashboard: 'Dashboard',
-                incidents: 'Incidents',
-                solutions: 'Solutions',
-                knowledge: 'Knowledge Base',
-                settings: 'Settings'
-            };
-            document.getElementById('pageTitle').textContent = titles[page] || 'Dashboard';
-
-            // Render content
-            renderContent();
-
-            // Close mobile menu
-            document.getElementById('sidebar').classList.remove('open');
-        }
-
-        function viewIncidentDetail(incidentId) {
-            appState.currentIncident = incidentId;
-            navigateToPage('incident-detail');
-        }
-
-        function renderContent() {
-            const contentArea = document.getElementById('contentArea');
-            let content = '';
-
-            switch (appState.currentPage) {
-                case 'dashboard':
-                    content = renderDashboard();
-                    break;
-                case 'incidents':
-                    content = renderIncidents();
-                    break;
-                case 'incident-detail':
-                    content = renderIncidentDetail();
-                    break;
-                case 'solutions':
-                    content = renderSolutions();
-                    break;
-                case 'knowledge':
-                    content = renderKnowledge();
-                    break;
-                case 'settings':
-                    content = renderSettings();
-                    break;
-                default:
-                    content = renderDashboard();
-            }
-
-            contentArea.innerHTML = content;
-
-            // Attach event listeners after render
-            attachEventListeners();
-        }
-
-        function attachEventListeners() {
-            // Search input
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', (e) => {
-                    appState.filters.search = e.target.value;
-                    renderContent();
-                });
-            }
-
-            // Filter selects
-            const categoryFilter = document.getElementById('categoryFilter');
-            if (categoryFilter) {
-                categoryFilter.value = appState.filters.category;
-                categoryFilter.addEventListener('change', (e) => {
-                    appState.filters.category = e.target.value;
-                    appState.currentPage_pagination = 1;
-                    renderContent();
-                });
-            }
-
-            const severityFilter = document.getElementById('severityFilter');
-            if (severityFilter) {
-                severityFilter.value = appState.filters.severity;
-                severityFilter.addEventListener('change', (e) => {
-                    appState.filters.severity = e.target.value;
-                    appState.currentPage_pagination = 1;
-                    renderContent();
-                });
-            }
-
-            const statusFilter = document.getElementById('statusFilter');
-            if (statusFilter) {
-                statusFilter.value = appState.filters.status;
-                statusFilter.addEventListener('change', (e) => {
-                    appState.filters.status = e.target.value;
-                    appState.currentPage_pagination = 1;
-                    renderContent();
-                });
-            }
-        }
-
-        function changePage(page) {
-            const filteredIncidents = getFilteredIncidents();
-            const totalPages = Math.ceil(filteredIncidents.length / appState.itemsPerPage);
-            
-            if (page >= 1 && page <= totalPages) {
-                appState.currentPage_pagination = page;
-                renderContent();
-            }
-        }
-
-        function exportData(format) {
-            showToast('Export Started', `Preparing ${format.toUpperCase()} export...`);
-            
-            // Simulate export
-            setTimeout(() => {
-                showToast('Export Complete', `${format.toUpperCase()} file has been downloaded`);
-            }, 1500);
-        }
-
-        // Initialize App
-        document.addEventListener('DOMContentLoaded', () => {
-            // Navigation event listeners
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    navigateToPage(item.dataset.page);
-                });
-            });
-
-            // Mobile menu toggle
-            document.getElementById('menuToggle').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.toggle('open');
-            });
-
-            // Initial render
-            renderContent();
-
-            // Initialize chat
-            initializeChat();
-        });
-
-        // Chat System
-        const chatResponses = {
-            greeting: "Hi! I'm your incident management assistant. How can I help you today?",
-            help: "I can help you with:\n• Create and search incidents\n• Filter by severity or status\n• Update incident information\n• Export data\n• Find similar issues\n\nJust ask in plain language!",
-            critical: "I found {count} critical incident(s). Here they are:",
-            create: "I'll help you create a new incident. What's the issue you're experiencing?",
-            export: "I can export incidents in JSON, CSV, or Markdown format. Which would you prefer?",
-            unknown: "I'm not sure I understood that. Could you try rephrasing? Or pick one of the quick actions below."
-        };
-
-        const conversationStarters = [
-            { label: "Show critical incidents", command: "show critical" },
-            { label: "Create new incident", command: "create new" },
-            { label: "This week's activity", command: "show this week" },
-            { label: "Need help", command: "help" }
-        ];
-
-        function initializeChat() {
-            const chatFloatBtn = document.getElementById('chatFloatBtn');
-            const chatCloseBtn = document.getElementById('chatCloseBtn');
-            const chatOverlay = document.getElementById('chatOverlay');
-            const chatSendBtn = document.getElementById('chatSendBtn');
-            const chatInput = document.getElementById('chatInput');
-            const mobileChat = document.getElementById('mobileChat');
-
-            // Show welcome message
-            showWelcomeMessage();
-
-            // Float button click
-            chatFloatBtn.addEventListener('click', () => openChat());
-
-            // Close button click
-            chatCloseBtn.addEventListener('click', () => closeChat());
-
-            // Overlay click (mobile)
-            chatOverlay.addEventListener('click', () => closeChat());
-
-            // Mobile chat button
-            if (mobileChat) {
-                mobileChat.addEventListener('click', () => openChat());
-            }
-
-            // Send message
-            chatSendBtn.addEventListener('click', () => sendMessage());
-
-            // Enter key to send
-            chatInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-
-            // Auto-resize textarea
-            chatInput.addEventListener('input', (e) => {
-                e.target.style.height = 'auto';
-                e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
-            });
-        }
-
-        function openChat() {
-            appState.chatOpen = true;
-            document.getElementById('chatPanel').classList.add('open');
-            document.getElementById('chatOverlay').classList.add('visible');
-            document.getElementById('chatInput').focus();
-        }
-
-        function closeChat() {
-            appState.chatOpen = false;
-            document.getElementById('chatPanel').classList.remove('open');
-            document.getElementById('chatOverlay').classList.remove('visible');
-        }
-
-        function showWelcomeMessage() {
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.innerHTML = `
-                <div class="chat-welcome">
-                    <div class="chat-welcome-icon">🤖</div>
-                    <div class="chat-welcome-title">Hi! I'm your AI Assistant</div>
-                    <div class="chat-welcome-text">
-                        I can help you manage incidents through natural conversation. 
-                        Try asking me to show critical incidents or create a new one!
-                    </div>
-                    <div class="quick-actions">
-                        ${conversationStarters.map(starter => `
-                            <button class="quick-action-btn" onclick="handleQuickAction('${starter.command}')">
-                                ${starter.label}
-                            </button>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        function addMessage(content, isUser = false, isCard = false) {
-            const messagesContainer = document.getElementById('chatMessages');
-            
-            // Remove welcome message if exists
-            const welcomeMsg = messagesContainer.querySelector('.chat-welcome');
-            if (welcomeMsg) {
-                welcomeMsg.remove();
-            }
-
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${isUser ? 'user' : 'ai'}`;
-            
-            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            
-            messageDiv.innerHTML = `
-                <div class="message-avatar ${isUser ? 'user' : 'ai'}">
-                    ${isUser ? 'A' : '🤖'}
-                </div>
-                <div class="message-content">
-                    <div class="message-bubble">${content}</div>
-                    <div class="message-time">${time}</div>
-                </div>
-            `;
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            
-            appState.chatMessages.push({ content, isUser, time });
-        }
-
-        function showTypingIndicator() {
-            const messagesContainer = document.getElementById('chatMessages');
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'chat-message ai';
-            typingDiv.id = 'typingIndicator';
-            typingDiv.innerHTML = `
-                <div class="message-avatar ai">🤖</div>
-                <div class="message-content">
-                    <div class="typing-indicator">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                    </div>
-                </div>
-            `;
-            messagesContainer.appendChild(typingDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function hideTypingIndicator() {
-            const indicator = document.getElementById('typingIndicator');
-            if (indicator) indicator.remove();
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
-            
-            // Add user message
-            addMessage(message, true);
-            input.value = '';
-            input.style.height = 'auto';
-            
-            // Process message
-            processMessage(message);
-        }
-
-        function processMessage(message) {
-            const lowerMessage = message.toLowerCase();
-            
-            showTypingIndicator();
-            
-            setTimeout(() => {
-                hideTypingIndicator();
-                
-                if (lowerMessage.includes('help')) {
-                    addMessage(chatResponses.help);
-                    addQuickActions();
-                } else if (lowerMessage.includes('critical')) {
-                    showCriticalIncidents();
-                } else if (lowerMessage.includes('create') || lowerMessage.includes('new incident')) {
-                    addMessage(chatResponses.create);
-                    addMessage('Here are some quick options:', false);
-                    addQuickActions([
-                        { label: 'Database Issue', command: 'create database' },
-                        { label: 'API Problem', command: 'create api' },
-                        { label: 'Performance Issue', command: 'create performance' }
-                    ]);
-                } else if (lowerMessage.includes('export')) {
-                    addMessage(chatResponses.export);
-                    addQuickActions([
-                        { label: 'Export JSON', command: 'export json' },
-                        { label: 'Export CSV', command: 'export csv' },
-                        { label: 'Export Markdown', command: 'export markdown' }
-                    ]);
-                } else if (lowerMessage.includes('this week') || lowerMessage.includes('recent')) {
-                    showRecentActivity();
-                } else if (lowerMessage.includes('show') && (lowerMessage.includes('all') || lowerMessage.includes('incident'))) {
-                    addMessage(`I found ${incidents.length} total incidents. Here are the most recent:`);
-                    showIncidentCards(incidents.slice(0, 3));
-                } else {
-                    addMessage(chatResponses.unknown);
-                    addQuickActions();
-                }
-            }, 1000);
-        }
-
-        function handleQuickAction(command) {
-            const input = document.getElementById('chatInput');
-            input.value = command;
-            sendMessage();
-        }
-
-        function addQuickActions(actions = conversationStarters) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'chat-message ai';
-            actionsDiv.innerHTML = `
-                <div class="message-avatar ai">🤖</div>
-                <div class="message-content">
-                    <div class="quick-actions">
-                        ${actions.map(action => `
-                            <button class="quick-action-btn" onclick="handleQuickAction('${action.command}')">
-                                ${action.label}
-                            </button>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-            messagesContainer.appendChild(actionsDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function showCriticalIncidents() {
-            const criticalIncidents = incidents.filter(i => i.severity === 'Critical');
-            
-            if (criticalIncidents.length === 0) {
-                addMessage('Good news! There are no critical incidents at the moment. 🎉');
-            } else {
-                addMessage(`I found ${criticalIncidents.length} critical incident(s). Here they are:`);
-                showIncidentCards(criticalIncidents);
-            }
-        }
-
-        function showRecentActivity() {
-            const recentIncidents = incidents.slice(0, 3);
-            const openCount = incidents.filter(i => i.status === 'open').length;
-            const resolvedToday = incidents.filter(i => i.status === 'resolved' && i.created === '2025-11-07').length;
-            
-            addMessage(`Here's your activity summary:\n\n📊 Total incidents: ${incidents.length}\n🚨 Open: ${openCount}\n✅ Resolved today: ${resolvedToday}\n\nRecent incidents:`);
-            showIncidentCards(recentIncidents);
-        }
-
-        function showIncidentCards(incidentList) {
-            const messagesContainer = document.getElementById('chatMessages');
-            
-            incidentList.forEach(incident => {
-                const cardDiv = document.createElement('div');
-                cardDiv.className = 'chat-message ai';
-                cardDiv.innerHTML = `
-                    <div class="message-avatar ai">🤖</div>
-                    <div class="message-content">
-                        <div class="incident-card" onclick="viewIncidentDetailFromChat('${incident.id}')">
-                            <div class="incident-card-header">
-                                <div>
-                                    <div class="incident-card-title">${incident.title}</div>
-                                    <div class="incident-card-meta">
-                                        <span class="badge ${getSeverityClass(incident.severity)}">${incident.severity}</span>
-                                        <span class="badge ${getStatusClass(incident.status)}">${incident.status}</span>
+                                    <div class="form-full">
+                                        <label class="form-label" for="incident-description">Description *</label>
+                                        <textarea id="incident-description" class="form-input" required></textarea>
                                     </div>
-                                </div>
+                                    <button type="submit" class="btn btn-primary">Create Incident</button>
+                                </form>
                             </div>
-                            <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 8px;">
-                                ${incident.id} • ${incident.category} • ${formatDate(incident.created)}
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Recent Incidents</h2>
+                            </div>
+                            <div class="card-content">
+                                <div id="incidents-list">
+                                    <div class="loading">Loading incidents...</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                `;
-                messagesContainer.appendChild(cardDiv);
-            });
-            
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
 
-        function viewIncidentDetailFromChat(incidentId) {
-            closeChat();
-            viewIncidentDetail(incidentId);
-            showToast('Opening Incident', `Viewing details for ${incidentId}`);
-        }
+                    <!-- Solutions Page -->
+                    <div id="solutions-page" class="page">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Solutions</h2>
+                            </div>
+                            <div class="card-content">
+                                <div id="solutions-list">
+                                    <div class="loading">Loading solutions...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        // Mobile navigation
-        document.addEventListener('DOMContentLoaded', () => {
-            const mobileNavItems = document.querySelectorAll('.mobile-nav-item[data-page]');
-            mobileNavItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    // Update active state
-                    mobileNavItems.forEach(navItem => navItem.classList.remove('active'));
-                    item.classList.add('active');
-                    
-                    // Navigate
-                    const page = item.dataset.page;
-                    navigateToPage(page);
-                });
-            });
-        });
-    </script>
+                    <!-- Knowledge Base Page -->
+                    <div id="knowledge-page" class="page">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Knowledge Base</h2>
+                            </div>
+                            <div class="card-content">
+                                <div id="knowledge-list">
+                                    <div class="loading">Loading knowledge base...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Page -->
+                    <div id="chat-page" class="page">
+                        <div class="chat-container">
+                            <div class="chat-messages" id="chat-messages">
+                                <div class="chat-message assistant">
+                                    👋 Hello! I'm your NoteByPine assistant. I can help you manage incidents, search for solutions, and provide system information. How can I assist you today?
+                                </div>
+                            </div>
+                            <div class="chat-input-container">
+                                <input type="text" id="chat-input" class="chat-input" placeholder="Type your message...">
+                                <button id="send-btn" class="btn btn-primary">Send</button>
+                            </div>
+                        </div>
+                        <div id="chat-help"></div>
+                    </div>
+
+                    <!-- Settings Page -->
+                    <div id="settings-page" class="page">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Settings</h2>
+                            </div>
+                            <div class="card-content">
+                                <p>Settings page coming soon...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search Results -->
+                    <div id="search-results" style="display: none;"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
 </body>
 </html>

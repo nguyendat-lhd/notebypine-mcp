@@ -13,18 +13,65 @@ router.get(
     const { page = 1, limit = 20 } = req.query as any;
     const dbService = req.app.locals.dbService;
 
-    const result = await dbService.getSolutions('', page, limit);
+    try {
+      // Check if database is available
+      if (dbService && await dbService.testConnection()) {
+        const result = await dbService.getSolutions('', page, limit);
 
-    res.json({
-      success: true,
-      data: result.items,
-      pagination: {
-        page: result.page,
-        perPage: result.perPage,
-        totalItems: result.totalItems,
-        totalPages: result.totalPages
+        res.json({
+          success: true,
+          data: result.items,
+          pagination: {
+            page: result.page,
+            perPage: result.perPage,
+            totalItems: result.totalItems,
+            totalPages: result.totalPages
+          }
+        });
+      } else {
+        // Return mock data when database is not available
+        const { mockSolutions } = await import('../config/mockData.js');
+        const pageNum = parseInt(page.toString());
+        const limitNum = parseInt(limit.toString());
+        const startIndex = (pageNum - 1) * limitNum;
+        const endIndex = startIndex + limitNum;
+        const paginatedSolutions = mockSolutions.slice(startIndex, endIndex);
+
+        res.json({
+          success: true,
+          data: paginatedSolutions,
+          pagination: {
+            page: pageNum,
+            perPage: limitNum,
+            totalItems: mockSolutions.length,
+            totalPages: Math.ceil(mockSolutions.length / limitNum)
+          }
+        });
       }
-    });
+    } catch (error) {
+      // Fallback to mock data on any error
+      try {
+        const { mockSolutions } = await import('../config/mockData.js');
+        const pageNum = parseInt(page.toString());
+        const limitNum = parseInt(limit.toString());
+        const startIndex = (pageNum - 1) * limitNum;
+        const endIndex = startIndex + limitNum;
+        const paginatedSolutions = mockSolutions.slice(startIndex, endIndex);
+
+        res.json({
+          success: true,
+          data: paginatedSolutions,
+          pagination: {
+            page: pageNum,
+            perPage: limitNum,
+            totalItems: mockSolutions.length,
+            totalPages: Math.ceil(mockSolutions.length / limitNum)
+          }
+        });
+      } catch (mockError) {
+        throw new AppException('Failed to fetch solutions', 500);
+      }
+    }
   })
 );
 

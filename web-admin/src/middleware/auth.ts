@@ -64,34 +64,65 @@ export class AuthMiddleware {
   async login(email: string, password: string, dbService: DatabaseService) {
     try {
       const client = dbService.getClient();
-      const user = await client.collection('users').getFirstListItem(`email = "${email}"`);
 
-      if (!user) {
-        throw new Error('User not found');
-      }
+      // Try to authenticate as admin first
+      try {
+        const adminAuth = await client.admins.authWithPassword(email, password);
+        const token = jwt.sign(
+          {
+            id: adminAuth.admin.id,
+            email: adminAuth.admin.email,
+            role: 'admin'
+          },
+          this.jwtSecret,
+          { expiresIn: '7d' }
+        );
 
-      // In a real implementation, you would verify the password here
-      // For PocketBase, this would involve using their auth methods
-      const token = jwt.sign(
-        {
-          id: user.id,
-          email: user.email,
-          role: user.role || 'user'
-        },
-        this.jwtSecret,
-        { expiresIn: '7d' }
-      );
+        return {
+          success: true,
+          data: {
+            token,
+            user: {
+              id: adminAuth.admin.id,
+              email: adminAuth.admin.email,
+              role: 'admin',
+              name: 'Administrator'
+            }
+          }
+        };
+      } catch (adminError) {
+        // If admin auth fails, try regular user authentication
+        const user = await client.collection('users').getFirstListItem(`email = "${email}"`);
 
-      return {
-        success: true,
-        token,
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role || 'user',
-          name: user.name
+        if (!user) {
+          throw new Error('User not found');
         }
-      };
+
+        // In a real implementation, you would verify the password here
+        // For PocketBase, this would involve using their auth methods
+        const token = jwt.sign(
+          {
+            id: user.id,
+            email: user.email,
+            role: user.role || 'user'
+          },
+          this.jwtSecret,
+          { expiresIn: '7d' }
+        );
+
+        return {
+          success: true,
+          data: {
+            token,
+            user: {
+              id: user.id,
+              email: user.email,
+              role: user.role || 'user',
+              name: user.name
+            }
+          }
+        };
+      }
     } catch (error) {
       return {
         success: false,

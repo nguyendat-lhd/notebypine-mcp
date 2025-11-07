@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Test</title>
+</head>
+<body>
+    <h1>Dashboard Data Test</h1>
+    <div id="results"></div>
+
+    <script>
+        // Test the API endpoints
+        async function testDashboard() {
+            const resultsDiv = document.getElementById('results');
+
+            try {
+                // First login to get token
+                const loginResponse = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@example.com',
+                        password: 'admin123456'
+                    })
+                });
+
+                const loginData = await loginResponse.json();
+                console.log('Login response:', loginData);
+
+                if (loginData.success) {
+                    const token = loginData.token;
+
+                    // Test dashboard APIs
+                    const [statsResponse, healthResponse] = await Promise.all([
+                        fetch('http://localhost:3000/api/v1/incidents/stats/summary', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        }),
+                        fetch('http://localhost:3000/api/v1/health/status', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        })
+                    ]);
+
+                    const stats = await statsResponse.json();
+                    const health = await healthResponse.json();
+
+                    console.log('Stats response:', stats);
+                    console.log('Health response:', health);
+
+                    resultsDiv.innerHTML = `
+                        <h2>API Test Results</h2>
+                        <h3>Stats Data:</h3>
+                        <pre>${JSON.stringify(stats, null, 2)}</pre>
+
+                        <h3>Health Data:</h3>
+                        <pre>${JSON.stringify(health, null, 2)}</pre>
+
+                        <h3>Expected Updates:</h3>
+                        <p>Total Incidents: ${stats.data.incidents}</p>
+                        <p>Total Solutions: ${stats.data.solutions}</p>
+                        <p>Knowledge Base: ${stats.data.knowledgeBase}</p>
+                        <p>Recent Incidents: ${stats.data.recent.length}</p>
+                        <p>High Severity: ${stats.data.highSeverity.length}</p>
+                        <p>System Status: ${health.status}</p>
+                        <p>Server Uptime: ${health.uptime}</p>
+                        <p>Memory Usage: ${health.memory.heapUsed}</p>
+                        <p>Database Status: ${health.database.status}</p>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<p>Login failed: ${loginData.error}</p>`;
+                }
+            } catch (error) {
+                console.error('Test failed:', error);
+                resultsDiv.innerHTML = `<p>Test failed: ${error.message}</p>`;
+            }
+        }
+
+        testDashboard();
+    </script>
+</body>
+</html>
