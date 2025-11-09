@@ -22,7 +22,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import apiService from '@/services/api';
+import { repositoryService } from '@/services/repository.service';
 import type { Solution } from '@/types';
 import { Plus, Search, Edit, Trash2, CheckCircle2, XCircle, BookOpen } from 'lucide-react';
 
@@ -59,8 +59,8 @@ const SolutionsPage: FC = () => {
   const fetchSolutions = async () => {
     try {
       setLoading(true);
-      const response = await apiService.getSolutions();
-      setSolutions(response.data.items || response.data || []);
+      const response = await repositoryService.solutions.findAll({ page: 1, limit: 20 });
+      setSolutions(response.items);
     } catch (error) {
       console.error('Failed to fetch solutions:', error);
       setSolutions([]);
@@ -73,9 +73,9 @@ const SolutionsPage: FC = () => {
     e.preventDefault();
     try {
       if (editingSolution) {
-        await apiService.updateSolution(editingSolution.id, formData);
+        await repositoryService.solutions.update(editingSolution.id, formData);
       } else {
-        await apiService.createSolution(formData);
+        await repositoryService.solutions.create(formData);
       }
 
       fetchSolutions();
@@ -126,7 +126,7 @@ const SolutionsPage: FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this solution?')) {
       try {
-        await apiService.deleteSolution(id);
+        await repositoryService.solutions.delete(id);
         fetchSolutions();
       } catch (error) {
         console.error('Failed to delete solution:', error);

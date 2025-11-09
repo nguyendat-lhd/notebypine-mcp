@@ -9,29 +9,24 @@ import {
   Server
 } from 'lucide-react';
 import type { DashboardStats, SystemHealth } from '@/types';
-import apiService from '@/services/api';
+import { repositoryService } from '@/services/repository.service';
 
 export const Dashboard: FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const user = apiService.getCurrentUser();
+  const user = repositoryService.auth.getCurrentUser();
 
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        const [statsResponse, healthResponse] = await Promise.all([
-          apiService.getDashboardStats(),
-          apiService.getSystemHealth()
+        const [stats, health] = await Promise.all([
+          repositoryService.dashboard.getStats(),
+          repositoryService.dashboard.getSystemHealth()
         ]);
 
-        if (statsResponse.success) {
-          setStats(statsResponse.data);
-        }
-
-        if (healthResponse.success) {
-          setHealth(healthResponse.data);
-        }
+        setStats(stats);
+        setHealth(health);
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
       } finally {

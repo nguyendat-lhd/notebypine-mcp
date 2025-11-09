@@ -22,7 +22,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import apiService from '@/services/api';
+import { repositoryService } from '@/services/repository.service';
 import type { Incident } from '@/types';
 import { Plus, Search, Edit, Trash2, AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
 
@@ -56,24 +56,11 @@ const IncidentsPage: FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiService.getIncidents();
-      
-      // Ensure we have the correct response structure
-      if (response.success && response.data) {
-        if (Array.isArray(response.data.items)) {
-          setIncidents(response.data.items);
-        } else if (Array.isArray(response.data)) {
-          // Fallback for different response structure
-          setIncidents(response.data);
-        } else {
-          setIncidents([]);
-        }
-      } else {
-        throw new Error(response.error || 'Failed to fetch incidents');
-      }
+      const response = await repositoryService.incidents.findAll({ page: 1, limit: 20 });
+      setIncidents(response.items);
     } catch (error: any) {
       console.error('Failed to fetch incidents:', error);
-      const errorMessage = error?.message || error?.error || 'Failed to fetch incidents. Please ensure PocketBase is running.';
+      const errorMessage = error?.message || 'Failed to fetch incidents. Please ensure PocketBase is running.';
       setError(errorMessage);
       setIncidents([]);
     } finally {
@@ -85,20 +72,20 @@ const IncidentsPage: FC = () => {
     e.preventDefault();
     try {
       if (editingIncident) {
-        await apiService.updateIncident(editingIncident.id, formData);
+        await repositoryService.incidents.update(editingIncident.id, formData);
       } else {
-        await apiService.createIncident(formData);
+        await repositoryService.incidents.create(formData);
       }
 
       fetchIncidents();
       setIsCreateDialogOpen(false);
       setEditingIncident(null);
-    setFormData({
-      title: '',
-      description: '',
-      severity: 'medium',
-      status: 'new',
-    });
+      setFormData({
+        title: '',
+        description: '',
+        severity: 'medium',
+        status: 'new',
+      });
     } catch (error) {
       console.error('Failed to save incident:', error);
     }
@@ -119,7 +106,7 @@ const IncidentsPage: FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this incident?')) {
       try {
-        await apiService.deleteIncident(id);
+        await repositoryService.incidents.delete(id);
         fetchIncidents();
       } catch (error) {
         console.error('Failed to delete incident:', error);

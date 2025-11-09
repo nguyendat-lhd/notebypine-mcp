@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LogIn, AlertCircle } from 'lucide-react';
-import apiService from '@/services/api';
+import { repositoryService } from '@/services/repository.service';
 import { ROUTES } from '@/utils/routes';
 
 export const LoginForm: React.FC = () => {
@@ -22,7 +22,7 @@ export const LoginForm: React.FC = () => {
     setError('');
 
     try {
-      const response = await apiService.login(email, password);
+      const response = await repositoryService.auth.login({ email, password });
 
       if (response.success) {
         // Redirect to the page user was trying to access, or dashboard

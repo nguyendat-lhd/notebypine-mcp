@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { pathToPage } from '@/utils/routes';
 import { ROUTES } from '@/utils/routes';
-import apiService from '@/services/api';
+import { repositoryService } from '@/services/repository.service';
 
 interface LayoutProps {
   children: ReactNode;
@@ -14,10 +14,10 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPage = pathToPage(location.pathname) || 'dashboard';
-  const user = apiService.getCurrentUser();
+  const user = repositoryService.auth.getCurrentUser();
 
   const handleLogout = () => {
-    apiService.logout();
+    repositoryService.auth.logout();
     navigate(ROUTES.LOGIN, { replace: true });
   };
 

@@ -9,11 +9,11 @@ import { KnowledgePage } from '@/components/knowledge/KnowledgePage';
 import { ChatPage } from '@/components/chatops/ChatPage';
 import { SettingsPage } from '@/components/settings/SettingsPage';
 import { ROUTES } from '@/utils/routes';
-import apiService from '@/services/api';
+import { repositoryService } from '@/services/repository.service';
 
 // Component to redirect authenticated users away from login page
 const LoginRoute = () => {
-  if (apiService.isAuthenticated()) {
+  if (repositoryService.auth.isAuthenticated()) {
     return <Navigate to={ROUTES.DASHBOARD} replace />;
   }
   return <LoginForm />;
