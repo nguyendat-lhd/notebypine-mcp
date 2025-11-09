@@ -63,6 +63,7 @@ const SolutionsPage: FC = () => {
       setSolutions(response.data.items || response.data || []);
     } catch (error) {
       console.error('Failed to fetch solutions:', error);
+      setSolutions([]);
     } finally {
       setLoading(false);
     }
@@ -191,10 +192,10 @@ const SolutionsPage: FC = () => {
   };
 
   const filteredSolutions = solutions.filter(solution =>
-    solution.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    solution.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (solution.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (solution.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (solution.category && solution.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (solution.tags && solution.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
+    (solution.tags && solution.tags.some(tag => tag && tag.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
   return (

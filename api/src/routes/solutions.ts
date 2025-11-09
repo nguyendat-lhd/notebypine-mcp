@@ -1,9 +1,37 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { AuthMiddleware, AuthenticatedRequest } from '../middleware/auth.js';
 import { validateRequest, validateQuery, schemas } from '../middleware/validation.js';
 import { ErrorHandler, AppException } from '../middleware/errorHandler.js';
 
 const router = Router();
+
+// Helper function to transform PocketBase format to frontend format
+const transformSolution = (item: any) => ({
+  id: item.id,
+  title: item.solution_title || item.title || '',
+  description: item.solution_description || item.description || '',
+  steps: item.steps || [],
+  category: item.category || 'troubleshooting',
+  tags: item.tags || [],
+  verified: item.verified || false,
+  incidentId: item.incident_id,
+  incident_id: item.incident_id,
+  created: item.created || item.created_at,
+  updated: item.updated || item.updated_at,
+  created_at: item.created || item.created_at,
+  updated_at: item.updated || item.updated_at,
+});
+
+// Helper function to transform frontend format to PocketBase format
+const transformToPocketBase = (data: any) => ({
+  solution_title: data.title || data.solution_title,
+  solution_description: data.description || data.solution_description,
+  incident_id: data.incidentId || data.incident_id,
+  steps: data.steps || [],
+  category: data.category || 'troubleshooting',
+  tags: data.tags || [],
+  verified: data.verified || false,
+});
 
 // Get all solutions
 router.get(
@@ -24,10 +52,13 @@ router.get(
     try {
       const result = await dbService.getSolutions('', page, limit);
 
+      // Transform PocketBase format to frontend format
+      const transformedItems = result.items.map(transformSolution);
+
       res.json({
         success: true,
         data: {
-          items: result.items,
+          items: transformedItems,
           total: result.totalItems
         }
       });
@@ -46,9 +77,10 @@ router.get(
 
     try {
       const solution = await dbService.getClient().collection('solutions').getOne(id);
+      
       res.json({
         success: true,
-        data: solution
+        data: transformSolution(solution)
       });
     } catch (error) {
       throw new AppException('Solution not found', 404);
@@ -63,7 +95,7 @@ router.post(
   ErrorHandler.asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const dbService = req.app.locals.dbService;
     const solutionData = {
-      ...req.body,
+      ...transformToPocketBase(req.body),
       createdBy: req.user?.id,
       created: new Date().toISOString()
     };
@@ -75,13 +107,13 @@ router.post(
     if (wsServer) {
       wsServer.broadcast({
         type: 'solution_created',
-        data: solution
+        data: transformSolution(solution)
       });
     }
 
     res.status(201).json({
       success: true,
-      data: solution
+      data: transformSolution(solution)
     });
   })
 );
@@ -94,7 +126,7 @@ router.put(
     const { id } = req.params;
     const dbService = req.app.locals.dbService;
     const updateData = {
-      ...req.body,
+      ...transformToPocketBase(req.body),
       updated: new Date().toISOString(),
       updatedBy: req.user?.id
     };
@@ -107,13 +139,13 @@ router.put(
       if (wsServer) {
         wsServer.broadcast({
           type: 'solution_updated',
-          data: solution
+          data: transformSolution(solution)
         });
       }
 
       res.json({
         success: true,
-        data: solution
+        data: transformSolution(solution)
       });
     } catch (error) {
       throw new AppException('Solution not found or update failed', 404);
