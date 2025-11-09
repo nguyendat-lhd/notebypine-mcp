@@ -37,6 +37,7 @@ interface IncidentFormData {
 const IncidentsPage: FC = () => {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingIncident, setEditingIncident] = useState<Incident | null>(null);
@@ -54,10 +55,27 @@ const IncidentsPage: FC = () => {
   const fetchIncidents = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await apiService.getIncidents();
-      setIncidents(response.data.items || response.data);
-    } catch (error) {
+      
+      // Ensure we have the correct response structure
+      if (response.success && response.data) {
+        if (Array.isArray(response.data.items)) {
+          setIncidents(response.data.items);
+        } else if (Array.isArray(response.data)) {
+          // Fallback for different response structure
+          setIncidents(response.data);
+        } else {
+          setIncidents([]);
+        }
+      } else {
+        throw new Error(response.error || 'Failed to fetch incidents');
+      }
+    } catch (error: any) {
       console.error('Failed to fetch incidents:', error);
+      const errorMessage = error?.message || error?.error || 'Failed to fetch incidents. Please ensure PocketBase is running.';
+      setError(errorMessage);
+      setIncidents([]);
     } finally {
       setLoading(false);
     }
@@ -293,6 +311,26 @@ const IncidentsPage: FC = () => {
               className="max-w-sm"
             />
           </div>
+
+          {error && (
+            <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-md">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-destructive" />
+                <div>
+                  <p className="text-sm font-medium text-destructive">Error loading incidents</p>
+                  <p className="text-sm text-muted-foreground">{error}</p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={fetchIncidents}
+                  className="ml-auto"
+                >
+                  Retry
+                </Button>
+              </div>
+            </div>
+          )}
 
           {loading ? (
             <div className="text-center py-8">Loading incidents...</div>

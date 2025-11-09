@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { AuthMiddleware, AuthenticatedRequest } from '../middleware/auth.js';
 import { validateRequest, validateQuery, schemas } from '../middleware/validation.js';
 import { RateLimitMiddleware } from '../middleware/rateLimiter.js';
@@ -45,6 +45,14 @@ router.get(
     const { id } = req.params;
     const dbService = req.app.locals.dbService;
 
+    // Check if database is available
+    if (!dbService || !(await dbService.testConnection())) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection required. Please ensure PocketBase is running.'
+      });
+    }
+
     try {
       const incident = await dbService.getClient().collection('incidents').getOne(id);
       res.json({
@@ -64,6 +72,15 @@ router.post(
   validateRequest(schemas.incident),
   ErrorHandler.asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const dbService = req.app.locals.dbService;
+
+    // Check if database is available
+    if (!dbService || !(await dbService.testConnection())) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection required. Please ensure PocketBase is running.'
+      });
+    }
+
     const incidentData = {
       ...req.body,
       createdBy: req.user?.id,
@@ -95,6 +112,15 @@ router.put(
   ErrorHandler.asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const dbService = req.app.locals.dbService;
+
+    // Check if database is available
+    if (!dbService || !(await dbService.testConnection())) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection required. Please ensure PocketBase is running.'
+      });
+    }
+
     const updateData = {
       ...req.body,
       updated: new Date().toISOString(),
@@ -129,6 +155,14 @@ router.delete(
   ErrorHandler.asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const dbService = req.app.locals.dbService;
+
+    // Check if database is available
+    if (!dbService || !(await dbService.testConnection())) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection required. Please ensure PocketBase is running.'
+      });
+    }
 
     try {
       await dbService.deleteIncident(id);
