@@ -156,6 +156,15 @@ async function setupDatabase() {
       { name: "time_spent", type: "text" },
     ]);
 
+    // Create knowledge_base collection
+    await createCollection("knowledge_base", [
+      { name: "title", type: "text", required: true },
+      { name: "content", type: "text", required: true },
+      { name: "tags", type: "json" },
+      { name: "createdBy", type: "text" },
+      { name: "updatedBy", type: "text" },
+    ]);
+
     console.log('🎉 Database setup complete!');
 
   } catch (error: any) {

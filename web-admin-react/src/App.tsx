@@ -5,7 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 import { Dashboard } from '@/components/dashboard/Dashboard';
 import IncidentsPage from '@/components/incidents/IncidentsPage';
 import SolutionsPage from '@/components/solutions/SolutionsPage';
-import { KnowledgePage } from '@/components/knowledge/KnowledgePage';
+import KnowledgePage from '@/components/knowledge/KnowledgePage';
 import { ChatPage } from '@/components/chatops/ChatPage';
 import { SettingsPage } from '@/components/settings/SettingsPage';
 import { ROUTES } from '@/utils/routes';

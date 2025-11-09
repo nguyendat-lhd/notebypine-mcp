@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { AuthMiddleware, AuthenticatedRequest } from '../middleware/auth.js';
 import { validateRequest, validateQuery, schemas } from '../middleware/validation.js';
 import { ErrorHandler, AppException } from '../middleware/errorHandler.js';
@@ -13,64 +13,28 @@ router.get(
     const { page = 1, limit = 50 } = req.query as any;
     const dbService = req.app.locals.dbService;
 
+    // Check if database is available
+    if (!dbService || !(await dbService.testConnection())) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection required. Please ensure PocketBase is running.'
+      });
+    }
+
     try {
-      // Check if database is available
-      if (dbService && await dbService.testConnection()) {
-        const result = await dbService.getKnowledgeItems('', page, limit);
+      const result = await dbService.getKnowledgeItems('', page, limit);
 
-        res.json({
-          success: true,
-          data: result.items,
-          pagination: {
-            page: result.page,
-            perPage: result.perPage,
-            totalItems: result.totalItems,
-            totalPages: result.totalPages
-          }
-        });
-      } else {
-        // Return mock data when database is not available
-        const { mockKnowledge } = await import('../config/mockData.js');
-        const pageNum = parseInt(page.toString());
-        const limitNum = parseInt(limit.toString());
-        const startIndex = (pageNum - 1) * limitNum;
-        const endIndex = startIndex + limitNum;
-        const paginatedKnowledge = mockKnowledge.slice(startIndex, endIndex);
-
-        res.json({
-          success: true,
-          data: paginatedKnowledge,
-          pagination: {
-            page: pageNum,
-            perPage: limitNum,
-            totalItems: mockKnowledge.length,
-            totalPages: Math.ceil(mockKnowledge.length / limitNum)
-          }
-        });
-      }
-    } catch (error) {
-      // Fallback to mock data on any error
-      try {
-        const { mockKnowledge } = await import('../config/mockData.js');
-        const pageNum = parseInt(page.toString());
-        const limitNum = parseInt(limit.toString());
-        const startIndex = (pageNum - 1) * limitNum;
-        const endIndex = startIndex + limitNum;
-        const paginatedKnowledge = mockKnowledge.slice(startIndex, endIndex);
-
-        res.json({
-          success: true,
-          data: paginatedKnowledge,
-          pagination: {
-            page: pageNum,
-            perPage: limitNum,
-            totalItems: mockKnowledge.length,
-            totalPages: Math.ceil(mockKnowledge.length / limitNum)
-          }
-        });
-      } catch (mockError) {
-        throw new AppException('Failed to fetch knowledge items', 500);
-      }
+      res.json({
+        success: true,
+        data: {
+          items: result.items,
+          total: result.totalItems
+        }
+      });
+    } catch (error: any) {
+      console.error('Error fetching knowledge items:', error);
+      const errorMessage = error?.message || error?.data?.message || 'Failed to fetch knowledge items';
+      throw new AppException(errorMessage, 500);
     }
   })
 );
@@ -81,6 +45,14 @@ router.get(
   ErrorHandler.asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const dbService = req.app.locals.dbService;
+
+    // Check if database is available
+    if (!dbService || !(await dbService.testConnection())) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection required. Please ensure PocketBase is running.'
+      });
+    }
 
     try {
       const item = await dbService.getClient().collection('knowledge_base').getOne(id);
@@ -100,6 +72,15 @@ router.post(
   validateRequest(schemas.knowledgeItem),
   ErrorHandler.asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const dbService = req.app.locals.dbService;
+
+    // Check if database is available
+    if (!dbService || !(await dbService.testConnection())) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection required. Please ensure PocketBase is running.'
+      });
+    }
+
     const itemData = {
       ...req.body,
       createdBy: req.user?.id,
@@ -131,6 +112,15 @@ router.put(
   ErrorHandler.asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const dbService = req.app.locals.dbService;
+
+    // Check if database is available
+    if (!dbService || !(await dbService.testConnection())) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection required. Please ensure PocketBase is running.'
+      });
+    }
+
     const updateData = {
       ...req.body,
       updated: new Date().toISOString(),
@@ -165,6 +155,14 @@ router.delete(
   ErrorHandler.asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const dbService = req.app.locals.dbService;
+
+    // Check if database is available
+    if (!dbService || !(await dbService.testConnection())) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection required. Please ensure PocketBase is running.'
+      });
+    }
 
     try {
       await dbService.deleteKnowledgeItem(id);
