@@ -166,25 +166,25 @@ export class DatabaseService {
         knowledgeBase: 0
       };
 
-      // Get incidents count
+      // Get incidents count - use getList to get totalItems
       try {
-        const incidents = await this.client.collection('incidents').getFullList(1, { total: true });
+        const incidents = await this.client.collection('incidents').getList(1, 1, {});
         stats.incidents = incidents.totalItems || 0;
       } catch (error) {
         console.warn('Failed to get incidents count:', error);
       }
 
-      // Get solutions count
+      // Get solutions count - use getList to get totalItems
       try {
-        const solutions = await this.client.collection('solutions').getFullList(1, { total: true });
+        const solutions = await this.client.collection('solutions').getList(1, 1, {});
         stats.solutions = solutions.totalItems || 0;
       } catch (error) {
         console.warn('Failed to get solutions count:', error);
       }
 
-      // Get knowledge base count (collection might not exist)
+      // Get knowledge base count (collection might not exist) - use getList to get totalItems
       try {
-        const knowledge = await this.client.collection('knowledge_base').getFullList(1, { total: true });
+        const knowledge = await this.client.collection('knowledge_base').getList(1, 1, {});
         stats.knowledgeBase = knowledge.totalItems || 0;
       } catch (error: any) {
         // Collection might not exist, that's OK
