@@ -11,7 +11,8 @@ router.get(
   '/',
   validateQuery(schemas.pagination),
   ErrorHandler.asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { page = 1, limit = 20 } = req.query as any;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
     const dbService = req.app.locals.dbService;
 
     // Check if database is available
@@ -32,8 +33,18 @@ router.get(
           total: result.totalItems
         }
       });
-    } catch (error) {
-      throw new AppException('Failed to fetch incidents', 500);
+    } catch (error: any) {
+      console.error('Failed to fetch incidents:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        status: error?.status,
+        response: error?.response,
+        stack: error?.stack
+      });
+      throw new AppException(
+        `Failed to fetch incidents: ${error?.message || 'Unknown error'}`,
+        500
+      );
     }
   })
 );
@@ -108,10 +119,16 @@ router.post(
 // Update incident
 router.put(
   '/:id',
-  validateRequest(schemas.incident),
+  validateRequest(schemas.incidentUpdate),
   ErrorHandler.asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const dbService = req.app.locals.dbService;
+
+    console.log('🔄 Update incident request:', {
+      id,
+      body: req.body,
+      user: req.user?.id
+    });
 
     // Check if database is available
     if (!dbService || !(await dbService.testConnection())) {
@@ -127,8 +144,17 @@ router.put(
       updatedBy: req.user?.id
     };
 
+    // Normalize field names (support both camelCase and snake_case)
+    if (updateData.assignedTo && !updateData.assigned_to) {
+      updateData.assigned_to = updateData.assignedTo;
+      delete updateData.assignedTo;
+    }
+
+    console.log('📝 Update data to send:', updateData);
+
     try {
       const incident = await dbService.updateIncident(id, updateData);
+      console.log('✅ Update successful:', incident);
 
       // Emit WebSocket event
       const wsServer = req.app.locals.wsServer;
@@ -143,8 +169,18 @@ router.put(
         success: true,
         data: incident
       });
-    } catch (error) {
-      throw new AppException('Incident not found or update failed', 404);
+    } catch (error: any) {
+      console.error('❌ Update failed:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        status: error?.status,
+        response: error?.response,
+        data: error?.data
+      });
+      throw new AppException(
+        `Incident not found or update failed: ${error?.message || 'Unknown error'}`,
+        404
+      );
     }
   })
 );

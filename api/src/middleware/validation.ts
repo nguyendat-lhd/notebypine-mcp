@@ -52,6 +52,19 @@ export const schemas = {
     metadata: Joi.object().optional()
   }),
 
+  // Schema for updating incidents - all fields optional except validation rules
+  incidentUpdate: Joi.object({
+    title: Joi.string().min(3).max(200).optional(),
+    description: Joi.string().min(3).optional(), // Reduced from 10 to 3 for updates
+    severity: Joi.string().valid('low', 'medium', 'high', 'critical').optional(),
+    status: Joi.string().valid('new', 'open', 'investigating', 'resolved', 'closed').optional(),
+    tags: Joi.array().items(Joi.string()).optional(),
+    assignedTo: Joi.string().optional(),
+    assigned_to: Joi.string().optional(), // Support both camelCase and snake_case
+    source: Joi.string().optional(),
+    metadata: Joi.object().optional()
+  }).min(1), // At least one field must be provided
+
   solution: Joi.object({
     title: Joi.string().required().min(3).max(200),
     description: Joi.string().required().min(10),

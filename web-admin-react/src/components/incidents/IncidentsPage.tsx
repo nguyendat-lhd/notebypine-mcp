@@ -70,14 +70,67 @@ const IncidentsPage: FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Store editingIncident in a local variable to prevent it from being reset
+    const currentEditingIncident = editingIncident;
+    
+    console.log('Form submit - editingIncident:', currentEditingIncident);
+    console.log('Form submit - formData:', formData);
+    
     try {
-      if (editingIncident) {
-        await repositoryService.incidents.update(editingIncident.id, formData);
+      if (currentEditingIncident && currentEditingIncident.id) {
+        console.log('🔄 UPDATE MODE - Updating incident:', currentEditingIncident.id);
+        
+        // Prepare update data - include all fields from formData
+        // Remove undefined values but keep empty strings and other falsy values that are valid
+        const updateData: Partial<IncidentFormData> = {
+          title: formData.title,
+          description: formData.description,
+          severity: formData.severity,
+          status: formData.status,
+        };
+        
+        // Only include assigned_to if it's defined
+        if (formData.assigned_to !== undefined) {
+          updateData.assigned_to = formData.assigned_to;
+        }
+        
+        // Remove undefined values
+        Object.keys(updateData).forEach(key => {
+          if (updateData[key as keyof IncidentFormData] === undefined) {
+            delete updateData[key as keyof IncidentFormData];
+          }
+        });
+        
+        console.log('Update data (filtered):', updateData);
+        
+        // Optimistically update the local state first for immediate UI feedback
+        setIncidents(prevIncidents =>
+          prevIncidents.map(incident =>
+            incident.id === currentEditingIncident.id 
+              ? { ...incident, ...updateData, updated_at: new Date().toISOString() }
+              : incident
+          )
+        );
+
+        // Then update on server
+        const updated = await repositoryService.incidents.update(currentEditingIncident.id, updateData);
+        console.log('✅ Update successful:', updated);
+        
+        // Refresh from server to ensure consistency and get latest data
+        await fetchIncidents();
       } else {
-        await repositoryService.incidents.create(formData);
+        console.log('➕ CREATE MODE - Creating new incident');
+        console.log('Create data:', formData);
+        
+        const created = await repositoryService.incidents.create(formData);
+        console.log('✅ Create successful:', created);
+        
+        // Refresh the list after create
+        await fetchIncidents();
       }
 
-      fetchIncidents();
+      // Close dialog and reset form ONLY after successful operation
       setIsCreateDialogOpen(false);
       setEditingIncident(null);
       setFormData({
@@ -87,20 +140,26 @@ const IncidentsPage: FC = () => {
         status: 'new',
       });
     } catch (error) {
-      console.error('Failed to save incident:', error);
+      console.error('❌ Failed to save incident:', error);
+      // Refresh list to revert optimistic update if it failed
+      await fetchIncidents();
+      // Keep dialog open on error so user can retry
+      // DON'T reset editingIncident here - keep it so user can see what they were editing
     }
   };
 
   const handleEdit = (incident: Incident) => {
+    console.log('📝 Edit clicked for incident:', incident.id, incident);
     setEditingIncident(incident);
     setFormData({
-      title: incident.title,
-      description: incident.description,
-      severity: incident.severity,
-      status: incident.status,
+      title: incident.title || '',
+      description: incident.description || '',
+      severity: (incident.severity || 'medium') as 'low' | 'medium' | 'high' | 'critical',
+      status: (incident.status || 'new') as 'new' | 'open' | 'investigating' | 'resolved' | 'closed',
       assigned_to: incident.assigned_to,
     });
     setIsCreateDialogOpen(true);
+    console.log('✅ Edit mode activated, editingIncident set to:', incident.id);
   };
 
   const handleDelete = async (id: string) => {
@@ -178,9 +237,37 @@ const IncidentsPage: FC = () => {
           </p>
         </div>
 
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <Dialog 
+          open={isCreateDialogOpen} 
+          onOpenChange={(open) => {
+            setIsCreateDialogOpen(open);
+            if (!open) {
+              // Only reset form and editing state when dialog closes
+              // This ensures editingIncident is preserved during the dialog lifecycle
+              console.log('Dialog closing, resetting form. Was editing:', editingIncident?.id);
+              setEditingIncident(null);
+              setFormData({
+                title: '',
+                description: '',
+                severity: 'medium',
+                status: 'new',
+              });
+            } else {
+              // Dialog is opening - log what mode we're in
+              console.log('Dialog opening. Edit mode:', !!editingIncident, 'Incident ID:', editingIncident?.id);
+            }
+          }}
+        >
           <DialogTrigger asChild>
-            <Button onClick={() => setEditingIncident(null)}>
+            <Button onClick={() => {
+              setEditingIncident(null);
+              setFormData({
+                title: '',
+                description: '',
+                severity: 'medium',
+                status: 'new',
+              });
+            }}>
               <Plus className="h-4 w-4 mr-2" />
               New Incident
             </Button>
@@ -188,20 +275,27 @@ const IncidentsPage: FC = () => {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>
-                {editingIncident ? 'Edit Incident' : 'Create New Incident'}
+                {editingIncident ? `Edit Incident: ${editingIncident.id}` : 'Create New Incident'}
               </DialogTitle>
               <DialogDescription>
                 {editingIncident
-                  ? 'Update the incident details below.'
+                  ? `Update the incident details below. (ID: ${editingIncident.id})`
                   : 'Fill in the details to create a new incident.'
                 }
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Debug info in development */}
+              {process.env.NODE_ENV === 'development' && editingIncident && (
+                <div className="text-xs text-muted-foreground p-2 bg-muted rounded">
+                  🔍 Debug: Editing incident ID: {editingIncident.id}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"
+                  name="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Enter incident title"
@@ -213,6 +307,7 @@ const IncidentsPage: FC = () => {
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
+                  name="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Describe the incident"
@@ -225,12 +320,13 @@ const IncidentsPage: FC = () => {
                 <div className="space-y-2">
                   <Label htmlFor="severity">Severity</Label>
                   <Select
-                    value={formData.severity}
+                    name="severity"
+                    value={formData.severity || 'medium'}
                     onValueChange={(value: 'low' | 'medium' | 'high' | 'critical') =>
                       setFormData({ ...formData, severity: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="severity">
                       <SelectValue placeholder="Select severity" />
                     </SelectTrigger>
                     <SelectContent>
@@ -245,12 +341,13 @@ const IncidentsPage: FC = () => {
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
                   <Select
-                    value={formData.status}
+                    name="status"
+                    value={formData.status || 'new'}
                     onValueChange={(value: 'new' | 'open' | 'investigating' | 'resolved' | 'closed') =>
                       setFormData({ ...formData, status: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="status">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -268,7 +365,16 @@ const IncidentsPage: FC = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setIsCreateDialogOpen(false)}
+                  onClick={() => {
+                    setIsCreateDialogOpen(false);
+                    setEditingIncident(null);
+                    setFormData({
+                      title: '',
+                      description: '',
+                      severity: 'medium',
+                      status: 'new',
+                    });
+                  }}
                 >
                   Cancel
                 </Button>

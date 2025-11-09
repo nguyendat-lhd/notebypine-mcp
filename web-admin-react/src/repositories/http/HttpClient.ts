@@ -35,10 +35,26 @@ export class HttpClient implements IHttpClient {
     const payload = isJson ? await response.json() : await response.text();
 
     if (!response.ok) {
-      const errorMessage =
-        typeof payload === 'object' && payload !== null && 'error' in payload
-          ? String(payload.error)
-          : response.statusText || 'Request failed';
+      // Extract detailed error message from validation errors
+      let errorMessage = 'Request failed';
+      
+      if (typeof payload === 'object' && payload !== null) {
+        if ('error' in payload) {
+          errorMessage = String(payload.error);
+        }
+        
+        // Include validation details if available
+        if ('details' in payload && Array.isArray(payload.details) && payload.details.length > 0) {
+          const validationErrors = payload.details
+            .map((detail: any) => `${detail.field}: ${detail.message}`)
+            .join('; ');
+          errorMessage = `${errorMessage}. ${validationErrors}`;
+        }
+      } else if (typeof payload === 'string') {
+        errorMessage = payload;
+      } else {
+        errorMessage = response.statusText || 'Request failed';
+      }
       
       const error = new Error(errorMessage);
       (error as Error & { status?: number; data?: unknown }).status = response.status;

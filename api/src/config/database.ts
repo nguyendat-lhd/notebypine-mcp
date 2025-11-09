@@ -13,6 +13,10 @@ export class DatabaseService {
   constructor(config: DatabaseConfig) {
     this.config = config;
     this.client = new PocketBase(config.url);
+    
+    // Configure auto-cancellation to prevent request cancellation issues
+    // Set a reasonable timeout to prevent hanging requests
+    this.client.autoCancellation(false); // Disable auto-cancellation to prevent errors
   }
 
   async authenticate(): Promise<boolean> {
@@ -31,16 +35,27 @@ export class DatabaseService {
 
       if (!authResponse.ok) {
         const errorData = await authResponse.json().catch(() => ({}));
-        throw new Error(`Authentication failed: ${authResponse.status} - ${errorData.message || authResponse.statusText}`);
+        const errorMessage = `Authentication failed: ${authResponse.status} - ${errorData.message || authResponse.statusText}`;
+        console.error('⚠️  PocketBase authentication failed:', errorMessage);
+        // Clear any stale auth data
+        this.client.authStore.clear();
+        return false;
       }
 
       const authData = await authResponse.json();
       // Store token in client for subsequent requests
-      this.client.authStore.save(authData.token, authData.admin);
-      console.log('✅ PocketBase authentication successful');
-      return true;
+      if (authData.token && authData.admin) {
+        this.client.authStore.save(authData.token, authData.admin);
+        console.log('✅ PocketBase authentication successful');
+        return true;
+      } else {
+        console.error('⚠️  Invalid authentication response format');
+        return false;
+      }
     } catch (error: any) {
-      console.warn('⚠️  PocketBase authentication failed:', error.message || error);
+      console.error('⚠️  PocketBase authentication error:', error.message || error);
+      // Clear any stale auth data
+      this.client.authStore.clear();
       return false;
     }
   }
@@ -85,14 +100,67 @@ export class DatabaseService {
   }
 
   async getIncidents(filter = '', page = 1, limit = 20) {
-    return await this.client.collection('incidents').getList(page, limit, {
-      filter,
-      sort: '-created'
-    });
+    // Ensure we're authenticated before making the query
+    // Re-authenticate if token is invalid or expired
+    if (!this.client.authStore.isValid) {
+      const authenticated = await this.authenticate();
+      if (!authenticated) {
+        throw new Error('Failed to authenticate with PocketBase');
+      }
+    }
+    
+    try {
+      return await this.client.collection('incidents').getList(page, limit, {
+        filter,
+        sort: '-created'
+      });
+    } catch (error: any) {
+      // Handle autocancellation or authentication errors
+      if (error?.message?.includes('autocancelled') || error?.status === 401 || error?.status === 403) {
+        console.warn('Authentication may have expired, re-authenticating...');
+        // Try to re-authenticate and retry once
+        const authenticated = await this.authenticate();
+        if (!authenticated) {
+          throw new Error('Failed to re-authenticate with PocketBase');
+        }
+        // Retry the request
+        return await this.client.collection('incidents').getList(page, limit, {
+          filter,
+          sort: '-created'
+        });
+      }
+      throw error;
+    }
   }
 
   async updateIncident(id: string, data: any) {
-    return await this.client.collection('incidents').update(id, data);
+    // Ensure we're authenticated before making the query
+    if (!this.client.authStore.isValid) {
+      const authenticated = await this.authenticate();
+      if (!authenticated) {
+        throw new Error('Failed to authenticate with PocketBase');
+      }
+    }
+    
+    try {
+      console.log('Updating incident in PocketBase:', { id, data });
+      const result = await this.client.collection('incidents').update(id, data);
+      console.log('PocketBase update result:', result);
+      return result;
+    } catch (error: any) {
+      console.error('PocketBase update error:', error);
+      // Handle autocancellation or authentication errors
+      if (error?.message?.includes('autocancelled') || error?.status === 401 || error?.status === 403) {
+        console.warn('Authentication may have expired, re-authenticating...');
+        const authenticated = await this.authenticate();
+        if (!authenticated) {
+          throw new Error('Failed to re-authenticate with PocketBase');
+        }
+        // Retry the request
+        return await this.client.collection('incidents').update(id, data);
+      }
+      throw error;
+    }
   }
 
   async deleteIncident(id: string) {
