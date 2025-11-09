@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -13,11 +14,11 @@ import {
 } from 'lucide-react';
 import type { FC } from 'react';
 import type { PageType, User } from '@/types';
+import { pageToPath } from '@/utils/routes';
 
 interface SidebarProps {
   user: User | null;
   currentPage: PageType;
-  onNavigate: (page: PageType) => void;
   onLogout: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
@@ -63,7 +64,6 @@ const navigationItems: Array<{
 export const Sidebar: FC<SidebarProps> = ({
   user,
   currentPage,
-  onNavigate,
   onLogout,
   isCollapsed,
   onToggleCollapse,
@@ -97,19 +97,23 @@ export const Sidebar: FC<SidebarProps> = ({
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentPage === item.id;
+          const path = pageToPath[item.id];
 
           return (
-            <Button
+            <NavLink
               key={item.id}
-              variant={isActive ? "default" : "ghost"}
-              className={`w-full justify-start ${
-                isCollapsed ? 'px-2' : 'px-3'
-              }`}
-              onClick={() => onNavigate(item.id)}
+              to={path}
+              className={({ isActive: isNavActive }) =>
+                `flex items-center w-full px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isNavActive || isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                } ${isCollapsed ? 'justify-center px-2' : 'justify-start'}`
+              }
             >
               <Icon className="h-4 w-4" />
               {!isCollapsed && <span className="ml-3">{item.label}</span>}
-            </Button>
+            </NavLink>
           );
         })}
       </nav>

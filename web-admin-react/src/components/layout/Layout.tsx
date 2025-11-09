@@ -1,31 +1,32 @@
 import { useState, type FC, type ReactNode } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import type { PageType, User } from '@/types';
+import { pathToPage } from '@/utils/routes';
+import { ROUTES } from '@/utils/routes';
+import apiService from '@/services/api';
 
 interface LayoutProps {
-  user: User | null;
   children: ReactNode;
-  currentPage: PageType;
-  onNavigate: (page: PageType) => void;
-  onLogout: () => void;
 }
 
-export const Layout: FC<LayoutProps> = ({
-  user,
-  children,
-  currentPage,
-  onNavigate,
-  onLogout,
-}) => {
+export const Layout: FC<LayoutProps> = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentPage = pathToPage(location.pathname) || 'dashboard';
+  const user = apiService.getCurrentUser();
+
+  const handleLogout = () => {
+    apiService.logout();
+    navigate(ROUTES.LOGIN, { replace: true });
+  };
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar
         user={user}
         currentPage={currentPage}
-        onNavigate={onNavigate}
-        onLogout={onLogout}
+        onLogout={handleLogout}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

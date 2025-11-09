@@ -8,17 +8,14 @@ import {
   TrendingUp,
   Server
 } from 'lucide-react';
-import type { DashboardStats, SystemHealth, User } from '@/types';
+import type { DashboardStats, SystemHealth } from '@/types';
 import apiService from '@/services/api';
 
-interface DashboardProps {
-  user: User | null;
-}
-
-export const Dashboard: FC<DashboardProps> = ({ user }) => {
+export const Dashboard: FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const user = apiService.getCurrentUser();
 
   useEffect(() => {
     const loadDashboardData = async () => {

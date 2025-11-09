@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LogIn, AlertCircle } from 'lucide-react';
 import apiService from '@/services/api';
+import { ROUTES } from '@/utils/routes';
 
-interface LoginFormProps {
-  onLoginSuccess: () => void;
-}
-
-export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
+export const LoginForm: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +25,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       const response = await apiService.login(email, password);
 
       if (response.success) {
-        onLoginSuccess();
+        // Redirect to the page user was trying to access, or dashboard
+        const from = (location.state as { from?: string })?.from || ROUTES.DASHBOARD;
+        navigate(from, { replace: true });
       } else {
         setError(response.error || 'Login failed');
       }

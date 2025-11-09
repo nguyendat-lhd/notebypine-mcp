@@ -1,98 +1,95 @@
-import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LoginForm } from '@/components/auth/LoginForm';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Layout } from '@/components/layout/Layout';
 import { Dashboard } from '@/components/dashboard/Dashboard';
 import IncidentsPage from '@/components/incidents/IncidentsPage';
 import SolutionsPage from '@/components/solutions/SolutionsPage';
-import type { PageType, User } from '@/types';
+import { KnowledgePage } from '@/components/knowledge/KnowledgePage';
+import { ChatPage } from '@/components/chatops/ChatPage';
+import { SettingsPage } from '@/components/settings/SettingsPage';
+import { ROUTES } from '@/utils/routes';
 import apiService from '@/services/api';
 
-function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [currentPage, setCurrentPage] = useState<PageType>('dashboard');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // Check if user is already authenticated on app load
-    if (apiService.isAuthenticated()) {
-      const currentUser = apiService.getCurrentUser();
-      setUser(currentUser);
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  const handleLoginSuccess = () => {
-    const currentUser = apiService.getCurrentUser();
-    setUser(currentUser);
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    apiService.logout();
-    setUser(null);
-    setIsAuthenticated(false);
-  };
-
-  const handleNavigate = (page: PageType) => {
-    setCurrentPage(page);
-  };
-
-  const renderCurrentPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <Dashboard user={user} />;
-      case 'incidents':
-        return <IncidentsPage />;
-      case 'solutions':
-        return <SolutionsPage />;
-      case 'knowledge':
-        return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Knowledge Base</h1>
-            <p className="text-muted-foreground">Manage knowledge base articles</p>
-            <div className="p-8 text-center border-2 border-dashed border-border rounded-lg">
-              <p className="text-muted-foreground">Knowledge base management coming soon...</p>
-            </div>
-          </div>
-        );
-      case 'chat':
-        return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold">ChatOps</h1>
-            <p className="text-muted-foreground">Chat with the system using natural language</p>
-            <div className="p-8 text-center border-2 border-dashed border-border rounded-lg">
-              <p className="text-muted-foreground">ChatOps interface coming soon...</p>
-            </div>
-          </div>
-        );
-      case 'settings':
-        return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Settings</h1>
-            <p className="text-muted-foreground">Manage system settings</p>
-            <div className="p-8 text-center border-2 border-dashed border-border rounded-lg">
-              <p className="text-muted-foreground">Settings management coming soon...</p>
-            </div>
-          </div>
-        );
-      default:
-        return <Dashboard user={user} />;
-    }
-  };
-
-  if (!isAuthenticated) {
-    return <LoginForm onLoginSuccess={handleLoginSuccess} />;
+// Component to redirect authenticated users away from login page
+const LoginRoute = () => {
+  if (apiService.isAuthenticated()) {
+    return <Navigate to={ROUTES.DASHBOARD} replace />;
   }
+  return <LoginForm />;
+};
 
+function App() {
   return (
-    <Layout
-      user={user}
-      currentPage={currentPage}
-      onNavigate={handleNavigate}
-      onLogout={handleLogout}
-    >
-      {renderCurrentPage()}
-    </Layout>
+    <BrowserRouter>
+      <Routes>
+        {/* Login route - redirects to dashboard if already authenticated */}
+        <Route path={ROUTES.LOGIN} element={<LoginRoute />} />
+        
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/"
+            element={
+              <Layout>
+                <Dashboard />
+              </Layout>
+            }
+          />
+          <Route
+            path={ROUTES.DASHBOARD}
+            element={
+              <Layout>
+                <Dashboard />
+              </Layout>
+            }
+          />
+          <Route
+            path={ROUTES.INCIDENTS}
+            element={
+              <Layout>
+                <IncidentsPage />
+              </Layout>
+            }
+          />
+          <Route
+            path={ROUTES.SOLUTIONS}
+            element={
+              <Layout>
+                <SolutionsPage />
+              </Layout>
+            }
+          />
+          <Route
+            path={ROUTES.KNOWLEDGE}
+            element={
+              <Layout>
+                <KnowledgePage />
+              </Layout>
+            }
+          />
+          <Route
+            path={ROUTES.CHAT}
+            element={
+              <Layout>
+                <ChatPage />
+              </Layout>
+            }
+          />
+          <Route
+            path={ROUTES.SETTINGS}
+            element={
+              <Layout>
+                <SettingsPage />
+              </Layout>
+            }
+          />
+        </Route>
+        
+        {/* Catch all - redirect to dashboard */}
+        <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
