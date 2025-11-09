@@ -6,7 +6,6 @@ import { createServer } from 'http';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
-import jwt from 'jsonwebtoken';
 
 // Import our modules
 import { DatabaseService } from './config/database.js';
@@ -133,63 +132,36 @@ class NoteByPineServer {
       });
     });
 
-    // Authentication endpoint with fallback for development
+    // Authentication endpoint - requires PocketBase
     this.app.post('/api/auth/login', RateLimitMiddleware.auth, async (req, res, next) => {
       try {
         const { email, password } = req.body;
 
-        // Fallback authentication for development when PocketBase is not available
+        if (!email || !password) {
+          return res.status(400).json({
+            success: false,
+            error: 'Email and password are required'
+          });
+        }
+
+        // Check if PocketBase is available
         let dbConnected = false;
-        let dbAvailable = false;
         try {
-          dbAvailable = !!this.dbService;
-          if (dbAvailable) {
-            // Check if PocketBase is actually available by trying health check
-            const health = await this.dbService.getClient().health.check();
-            dbConnected = health.code === 200;
-          }
-          console.log(`Database availability: ${dbAvailable}, connected: ${dbConnected}`);
+          const health = await this.dbService.getClient().health.check();
+          dbConnected = health.code === 200;
         } catch (error) {
-          console.log('Database connection test failed, using fallback auth:', error.message);
+          console.log('PocketBase not available, authentication will fail');
         }
 
         if (!dbConnected) {
-          console.log('Using fallback authentication');
-          // Simple hardcoded authentication for development
-          if (email === 'admin@example.com' && password === 'admin123456') {
-            console.log('Credentials match, generating token');
-            const token = jwt.sign(
-              {
-                id: 'dev-admin-id',
-                email: 'admin@example.com',
-                role: 'admin'
-              },
-              process.env.JWT_SECRET || 'default-secret',
-              { expiresIn: '7d' }
-            );
-
-            return res.json({
-              success: true,
-              data: {
-                token,
-                user: {
-                  id: 'dev-admin-id',
-                  email: 'admin@example.com',
-                  role: 'admin',
-                  name: 'Admin User'
-                }
-              }
-            });
-          } else {
-            console.log('Invalid credentials provided');
-            return res.status(401).json({
-              success: false,
-              error: 'Invalid credentials'
-            });
-          }
+          console.log('PocketBase not connected, rejecting authentication');
+          return res.status(503).json({
+            success: false,
+            error: 'Database connection required. Please ensure PocketBase is running.'
+          });
         }
 
-        // Try PocketBase authentication if available
+        // Authenticate with PocketBase only
         const result = await this.authMiddleware.login(email, password, this.dbService);
 
         if (result.success) {

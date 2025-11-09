@@ -18,6 +18,7 @@
     "start": "bun src/index.ts",
     "pb:serve": "./pocketbase serve --dir ./pb_data",
     "setup:pocketbase": "bun scripts/setup-pocketbase.ts",
+    "create:admin": "bun scripts/create-admin.ts",
     "start:all": "./scripts/start-all.sh",
     "start:api": "cd api && bun run dev",
     "start:web": "cd web-admin-react && bun run dev",

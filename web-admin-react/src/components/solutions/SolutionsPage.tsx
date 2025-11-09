@@ -95,6 +95,20 @@ const SolutionsPage: FC = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      steps: [''],
+      category: 'troubleshooting',
+      tags: [],
+      verified: false,
+    });
+    setNewStep('');
+    setNewTag('');
+    setEditingSolution(null);
+  };
+
   const handleEdit = (solution: Solution) => {
     setEditingSolution(solution);
     setFormData({
@@ -153,11 +167,34 @@ const SolutionsPage: FC = () => {
     });
   };
 
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'troubleshooting':
+        return 'default';
+      case 'performance':
+        return 'secondary';
+      case 'configuration':
+        return 'outline';
+      case 'security':
+        return 'destructive';
+      case 'deployment':
+        return 'default';
+      case 'maintenance':
+        return 'secondary';
+      default:
+        return 'outline';
+    }
+  };
+
+  const getVerifiedStatusColor = (verified: boolean) => {
+    return verified ? 'default' : 'secondary';
+  };
+
   const filteredSolutions = solutions.filter(solution =>
     solution.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     solution.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    solution.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    solution.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    (solution.category && solution.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (solution.tags && solution.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
   return (
@@ -170,9 +207,14 @@ const SolutionsPage: FC = () => {
           </p>
         </div>
 
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <Dialog open={isCreateDialogOpen} onOpenChange={(open) => {
+          setIsCreateDialogOpen(open);
+          if (!open) {
+            resetForm();
+          }
+        }}>
           <DialogTrigger asChild>
-            <Button onClick={() => setEditingSolution(null)}>
+            <Button onClick={() => resetForm()}>
               <Plus className="h-4 w-4 mr-2" />
               New Solution
             </Button>
@@ -333,18 +375,7 @@ const SolutionsPage: FC = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    setIsCreateDialogOpen(false);
-                    setEditingSolution(null);
-                    setFormData({
-                      title: '',
-                      description: '',
-                      steps: [''],
-                      category: 'troubleshooting',
-                      tags: [],
-                      verified: false,
-                    });
-                  }}
+                  onClick={() => setIsCreateDialogOpen(false)}
                 >
                   Cancel
                 </Button>
@@ -414,7 +445,9 @@ const SolutionsPage: FC = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{solution.category || 'N/A'}</Badge>
+                        <Badge variant={getCategoryColor(solution.category || 'troubleshooting')}>
+                          {solution.category || 'N/A'}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
@@ -439,15 +472,15 @@ const SolutionsPage: FC = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={solution.verified ? 'default' : 'secondary'} className="flex items-center w-fit">
+                        <Badge variant={getVerifiedStatusColor(solution.verified)} className="flex items-center w-fit">
                           {solution.verified ? (
                             <>
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              <CheckCircle2 className="h-4 w-4 mr-1" />
                               Verified
                             </>
                           ) : (
                             <>
-                              <XCircle className="h-3 w-3 mr-1" />
+                              <XCircle className="h-4 w-4 mr-1" />
                               Unverified
                             </>
                           )}

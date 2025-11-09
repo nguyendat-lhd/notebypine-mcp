@@ -64,69 +64,113 @@ export class AuthMiddleware {
   async login(email: string, password: string, dbService: DatabaseService) {
     try {
       const client = dbService.getClient();
+      const baseUrl = client.baseUrl;
 
-      // Try to authenticate as admin first
+      // Try to authenticate as admin first using REST API
       try {
-        const adminAuth = await client.admins.authWithPassword(email, password);
-        const token = jwt.sign(
-          {
-            id: adminAuth.admin.id,
-            email: adminAuth.admin.email,
-            role: 'admin'
+        const adminAuthResponse = await fetch(`${baseUrl}/api/admins/auth-with-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-          this.jwtSecret,
-          { expiresIn: '7d' }
-        );
+          body: JSON.stringify({
+            identity: email,
+            password: password,
+          }),
+        });
 
-        return {
-          success: true,
-          data: {
-            token,
-            user: {
+        if (adminAuthResponse.ok) {
+          const adminAuth = await adminAuthResponse.json();
+          const token = jwt.sign(
+            {
               id: adminAuth.admin.id,
               email: adminAuth.admin.email,
-              role: 'admin',
-              name: 'Administrator'
-            }
-          }
-        };
-      } catch (adminError) {
-        // If admin auth fails, try regular user authentication
-        const user = await client.collection('users').getFirstListItem(`email = "${email}"`);
+              role: 'admin'
+            },
+            this.jwtSecret,
+            { expiresIn: '7d' }
+          );
 
-        if (!user) {
-          throw new Error('User not found');
+          return {
+            success: true,
+            data: {
+              token,
+              user: {
+                id: adminAuth.admin.id,
+                email: adminAuth.admin.email,
+                role: 'admin',
+                name: 'Administrator'
+              }
+            }
+          };
+        } else {
+          const errorData = await adminAuthResponse.json().catch(() => ({}));
+          throw { status: adminAuthResponse.status, message: errorData.message || adminAuthResponse.statusText };
         }
+      } catch (adminError: any) {
+        // Log admin auth error for debugging
+        console.log(`Admin authentication failed for ${email}:`, adminError.status || adminError.message);
+        
+        // If admin auth fails, try regular user authentication with PocketBase
+        try {
+          const userAuthResponse = await fetch(`${baseUrl}/api/collections/users/auth-with-password`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              identity: email,
+              password: password,
+            }),
+          });
 
-        // In a real implementation, you would verify the password here
-        // For PocketBase, this would involve using their auth methods
-        const token = jwt.sign(
-          {
-            id: user.id,
-            email: user.email,
-            role: user.role || 'user'
-          },
-          this.jwtSecret,
-          { expiresIn: '7d' }
-        );
+          if (userAuthResponse.ok) {
+            const userAuth = await userAuthResponse.json();
+            
+            const token = jwt.sign(
+              {
+                id: userAuth.record.id,
+                email: userAuth.record.email,
+                role: userAuth.record.role || 'user'
+              },
+              this.jwtSecret,
+              { expiresIn: '7d' }
+            );
 
-        return {
-          success: true,
-          data: {
-            token,
-            user: {
-              id: user.id,
-              email: user.email,
-              role: user.role || 'user',
-              name: user.name
-            }
+            return {
+              success: true,
+              data: {
+                token,
+                user: {
+                  id: userAuth.record.id,
+                  email: userAuth.record.email,
+                  role: userAuth.record.role || 'user',
+                  name: userAuth.record.name || userAuth.record.email
+                }
+              }
+            };
+          } else {
+            const errorData = await userAuthResponse.json().catch(() => ({}));
+            throw { status: userAuthResponse.status, message: errorData.message || userAuthResponse.statusText };
           }
-        };
+        } catch (userError: any) {
+          // Both admin and user authentication failed
+          console.log(`User authentication also failed for ${email}:`, userError.status || userError.message);
+          
+          // Provide helpful error message
+          if (adminError.status === 400 || adminError.status === 404) {
+            throw new Error('Account not found. Please check your email or create an account.');
+          } else if (adminError.status === 403) {
+            throw new Error('Invalid password. Please check your credentials.');
+          } else {
+            throw new Error('Invalid credentials');
+          }
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
-        error: 'Invalid credentials'
+        error: error.message || 'Invalid credentials'
       };
     }
   }

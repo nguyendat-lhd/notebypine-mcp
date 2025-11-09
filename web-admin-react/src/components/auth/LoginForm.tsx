@@ -11,8 +11,8 @@ interface LoginFormProps {
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
-  const [email, setEmail] = useState('admin@example.com');
-  const [password, setPassword] = useState('admin123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -61,7 +61,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -104,9 +104,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               )}
             </Button>
           </form>
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            Demo credentials: admin@example.com / admin123456
-          </div>
         </CardContent>
       </Card>
     </div>
